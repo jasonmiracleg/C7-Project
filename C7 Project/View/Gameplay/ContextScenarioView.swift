@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ContextScenarioView: View {
+    @State private var showGameplaySheet = false
+    
     var text: String =
         "The CEO of your company is doing an impromptu company visit. Apparently they are laying off some of the workforce for efficiency. He is asking everyone to tell him about what they worked on in the past week."
 
@@ -21,7 +23,9 @@ struct ContextScenarioView: View {
                         .fill(Color.gray.opacity(0.2))
                 )
             Spacer()
-            Button(action: {}) {
+            Button(action: {
+                showGameplaySheet = true
+            }) {
                 Text("START YOUR CONVERSATION")
                     .font(.headline)
             }
@@ -32,6 +36,10 @@ struct ContextScenarioView: View {
                     .fill(Color.accentColor.opacity(0.8))
             )
             .foregroundStyle(Color.white)
+            .fullScreenCover(isPresented: $showGameplaySheet) {
+                GameplaySheetView()
+                    .padding(.horizontal, 24)
+            }
         }
         .padding(.horizontal, 24)
 
