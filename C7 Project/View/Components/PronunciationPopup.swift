@@ -12,7 +12,6 @@ struct PronunciationPopup: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // 1. Header with Title and Close Button
             HStack {
                 Text("The correct pronunciation would be:")
                     .font(.headline)
@@ -27,21 +26,17 @@ struct PronunciationPopup: View {
                 }
             }
             
-            // 2. Pronunciation and Player
             HStack(spacing: 12) {
                 Text(correctionText)
                     .font(.title3.weight(.medium))
                 
                 Spacer()
                 
-                // Placeholder for waveform
                 Image(systemName: "waveform")
                     .font(.title2)
                     .foregroundColor(.gray)
                 
-                // Placeholder for speaker button
                 Button(action: {
-                    // Add action to play audio
                 }) {
                     Image(systemName: "speaker.wave.2.fill")
                         .font(.title2)
