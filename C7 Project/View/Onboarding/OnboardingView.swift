@@ -45,6 +45,7 @@ struct OnboardingHalfModalView: View {
                             .foregroundStyle(Color(.blue))
                             
                         Text(steps[step].description)
+                            .font(.subheadline)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
                             .font(.default)
@@ -56,36 +57,20 @@ struct OnboardingHalfModalView: View {
                     PageIndicatorDots(totalSteps: steps.count, currentStep: step)
                         .padding(.bottom, 48)
                     
-//                    Purely for testing the page indicators
-//                    Button(action: {
-//                        step -= 1
-//                        if step < 0 {
-//                            step = 0
-//                        }
-//                    }) {
-//                        Text("Back")
-//                    }
-                    
                     Button(action: {
                         step += 1
                         if step > 2 {
                             step = 2
                         }
                     }) {
-                        Text(step < 2 ? "Next Page" : "Get Started")
-                            .frame(maxWidth: .infinity)
-                            .font(.title3.bold())
-                        
-                        ZStack{
-//                            I dont wanna figure out the circle color rn
-//                            Circle()
-//                                .frame(width: 36, height: 36)
-//                                .foregroundStyle(Color.gray.opacity(0.7))
+                        HStack{
+                            Text(step < 2 ? "NEXT PAGE" : "GET STARTED")
+                                .frame(maxWidth: .infinity)
+                                .font(.title3)
+                                .fontWeight(.bold)
                             Image(systemName:"arrow.right")
                         }
-                        .padding(.leading, -20)
-                        
-                        }
+                    }
                     .padding()
                     .background(Color.blue)
                     .foregroundColor(.white)
@@ -94,7 +79,7 @@ struct OnboardingHalfModalView: View {
                     .padding(.bottom, 24)
                     
                 }
-                .frame(height: UIScreen.main.bounds.height / 100 * 45)
+                .frame(height: UIScreen.main.bounds.height * 0.45)
                 .frame(maxWidth: .infinity)
                 .background(
                     RoundedRectangle(cornerRadius: 24)
@@ -105,23 +90,6 @@ struct OnboardingHalfModalView: View {
 
             }
             .ignoresSafeArea(edges: .bottom)
-        }
-    }
-}
-
-struct PageIndicatorDots: View {
-    let totalSteps: Int
-    let currentStep: Int
-    
-    var body: some View {
-        HStack(spacing: 8) {
-            ForEach(0...totalSteps-1, id: \.self) { index in
-                Capsule()
-                    .fill(index == currentStep ? Color.blue : Color.blue.opacity(0.3))
-                    .frame(width: index == currentStep ? 20 : 10,
-                           height: 10)
-                    .animation(.easeInOut(duration: 0.2), value: currentStep)
-            }
         }
     }
 }
