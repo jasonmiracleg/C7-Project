@@ -16,8 +16,14 @@ enum tabSegments: String, CaseIterable{
 struct EvaluationView: View {
     @State private var selectedSegment: tabSegments = .pronunciation
     
+    @State private var showingPronunciationPopup = false
+    @State private var pronunciationCorrection = ""
+    
+    @State private var showingGrammarPopup = false
+    @State private var grammarCorrectionText = ""
+    
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             Picker("Evaluation Tab", selection: $selectedSegment){
                 ForEach(tabSegments.allCases, id: \.self){
                     Text($0.rawValue)
@@ -25,25 +31,73 @@ struct EvaluationView: View {
             }
             .pickerStyle(.segmented)
             .padding(.horizontal)
+            .padding(.bottom, 10)
             
-            chosenTabView(selectedTab: selectedSegment)
+            chosenTabView(
+                selectedTab: selectedSegment,
+                showingPronunciationPopup: $showingPronunciationPopup,
+                pronunciationCorrection: $pronunciationCorrection,
+                showingGrammarPopup: $showingGrammarPopup,
+                grammarCorrectionText: $grammarCorrectionText
+            )
+            
             Spacer()
             
         }
         .navigationTitle("Evaluation")
         .navigationBarTitleDisplayMode(.inline)
+        .overlay(
+            Group {
+                if showingPronunciationPopup || showingGrammarPopup {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            showingPronunciationPopup = false
+                            showingGrammarPopup = false
+                        }
+                }
+                
+                if showingPronunciationPopup {
+                    PronunciationPopup(
+                        correctionText: pronunciationCorrection,
+                        isPresented: $showingPronunciationPopup
+                    )
+                    .transition(.scale.combined(with: .opacity))
+                }
+                
+                if showingGrammarPopup {
+                    GrammarPopup(
+                        correctionText: grammarCorrectionText,
+                        isPresented: $showingGrammarPopup
+                    )
+                    .transition(.scale.combined(with: .opacity))
+                }
+            }
+            .animation(.easeInOut, value: showingPronunciationPopup || showingGrammarPopup)
+        )
     }
 }
 
 struct chosenTabView: View {
     var selectedTab: tabSegments
     
+    @Binding var showingPronunciationPopup: Bool
+    @Binding var pronunciationCorrection: String
+    @Binding var showingGrammarPopup: Bool
+    @Binding var grammarCorrectionText: String
+    
     var body: some View {
         switch selectedTab {
             case .pronunciation:
-                PronunciationEvaluationView()
+                PronunciationEvaluationView(
+                    showingPronunciationPopup: $showingPronunciationPopup,
+                    pronunciationCorrection: $pronunciationCorrection
+                )
             case .grammar:
-                GrammarEvaluationView()
+                GrammarEvaluationView(
+                    showingPopup: $showingGrammarPopup,
+                    correctionText: $grammarCorrectionText
+                )
             case .interpretation:
                 InterpretationEvaluationView()
         }
