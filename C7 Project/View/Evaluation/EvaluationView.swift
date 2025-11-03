@@ -19,8 +19,9 @@ struct EvaluationView: View {
     @State private var showingPronunciationPopup = false
     @State private var pronunciationCorrection = ""
     
+    
     @State private var showingGrammarPopup = false
-    @State private var grammarCorrectionText = ""
+    @State private var selectedGrammarDetail: GrammarEvaluationDetail? = nil
     
     var body: some View {
         VStack(spacing: 0) {
@@ -38,7 +39,7 @@ struct EvaluationView: View {
                 showingPronunciationPopup: $showingPronunciationPopup,
                 pronunciationCorrection: $pronunciationCorrection,
                 showingGrammarPopup: $showingGrammarPopup,
-                grammarCorrectionText: $grammarCorrectionText
+                selectedGrammarDetail: $selectedGrammarDetail
             )
             
             Spacer()
@@ -65,9 +66,9 @@ struct EvaluationView: View {
                     .transition(.scale.combined(with: .opacity))
                 }
                 
-                if showingGrammarPopup {
+                if showingGrammarPopup, let detail = selectedGrammarDetail {
                     GrammarPopup(
-                        correctionText: grammarCorrectionText,
+                        detail: detail,
                         isPresented: $showingGrammarPopup
                     )
                     .transition(.scale.combined(with: .opacity))
@@ -84,19 +85,16 @@ struct chosenTabView: View {
     @Binding var showingPronunciationPopup: Bool
     @Binding var pronunciationCorrection: String
     @Binding var showingGrammarPopup: Bool
-    @Binding var grammarCorrectionText: String
+    @Binding var selectedGrammarDetail: GrammarEvaluationDetail?
     
     var body: some View {
         switch selectedTab {
             case .pronunciation:
-                PronunciationEvaluationView(
-                    showingPronunciationPopup: $showingPronunciationPopup,
-                    pronunciationCorrection: $pronunciationCorrection
-                )
+                PronunciationEvaluationView(showingPronunciationPopup: $showingPronunciationPopup, pronunciationCorrection: $pronunciationCorrection)
             case .grammar:
                 GrammarEvaluationView(
                     showingPopup: $showingGrammarPopup,
-                    correctionText: $grammarCorrectionText
+                    selectedGrammarDetail: $selectedGrammarDetail
                 )
             case .interpretation:
                 InterpretationEvaluationView()
