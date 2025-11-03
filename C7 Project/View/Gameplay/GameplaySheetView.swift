@@ -9,6 +9,8 @@ import SwiftUI
 
 struct GameplaySheetView: View {
     @Environment(\.dismiss) var dismiss
+    @State private var isRecording = false
+    @State private var isFinished = false
 
     var body: some View {
         VStack {
@@ -22,9 +24,8 @@ struct GameplaySheetView: View {
                             .font(.subheadline)
                     }
                     Spacer()
-                    Text("Game Play")
+                    Text("Gameplay")
                         .font(.title2)
-                        .fontWeight(.bold)
                     Spacer()
                     Button(action: {
                         dismiss()
@@ -32,17 +33,14 @@ struct GameplaySheetView: View {
                         Image(systemName: "xmark")
                             .foregroundStyle(Color(.black))
                             .font(Font.system(size: 24))
-                            .padding(12)
-                            .background(
-                                Circle()
-                                    .fill(Color.gray.opacity(0.2))
-                            )
                     }
+                    .buttonStyle(.glass)
                 }
                 Text("Big Shot")
                     .font(.title)
                     .fontWeight(.bold)
             }
+            
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 24) {
                     MessageBubble(
@@ -73,47 +71,86 @@ struct GameplaySheetView: View {
                 }
             }
             .frame(height: 500)
-            Image("Sound Wave")
-            HStack(spacing: 56) {
+            Spacer()
+            
+            if isFinished {
+                Text("Good Job!")
+                    .font(.title)
+                    .fontWeight(.bold)
+                Text("Now, Let's review how you did")
+                    .padding(.bottom, 12)
                 Button(action: {
-
+                   
                 }) {
-                    Image(systemName: "arrow.trianglehead.clockwise")
-                        .foregroundStyle(Color(.black))
-                        .font(Font.system(size: 24))
-                        .padding(16)
-                        .background(
-                            Circle()
-                                .fill(Color.gray.opacity(0.15))
-                        )
+                    Text("View Evaluation")
+                        .font(.headline)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity)
+                .background(
+                    Capsule()
+                        .fill(Color.accentColor.opacity(0.8))
+                )
+                .foregroundStyle(Color.white)
+                Spacer()
+            } else {
+                if !isRecording {
+                    HStack {
+                        Button(action: {
+                            
+                        }) {
+                            Image(systemName: "xmark")
+                                .foregroundStyle(Color(.black))
+                                .font(Font.system(size: 24))
+                                .padding(12)
+                                .background(
+                                    Circle()
+                                        .fill(Color.gray.opacity(0.2))
+                                )
+                        }
+                        ZStack(alignment: .trailing) {
+                            TextField("", text: .constant(""))
+                                .padding(12)
+                                .background(
+                                    Capsule()
+                                        .fill(Color.gray.opacity(0.2))
+                                )
+                            Button(action: {
+                                
+                            }) {
+                                Image(systemName: "paperplane.fill")
+                                    .foregroundStyle(Color.white)
+                                    .padding(8)
+                                    .background(
+                                        Circle()
+                                            .fill(Color.interactive)
+                                    )
+                                    .padding(.trailing, 4)
+                            }
+                        }
+                    }
+                    Spacer()
+                } else {
+                    Image("Sound Wave")
+                    Spacer()
                 }
                 Button(action: {
-
+                    isRecording.toggle()
                 }) {
-                    Image(systemName: "microphone.fill")
-                        .foregroundStyle(Color(.white))
-                        .font(Font.system(size: 32))
-                        .padding(18)
-                        .background(
-                            Circle()
-                                .fill(Color.microphone)
-                        )
-                }
-                Button(action: {
-
-                }) {
-                    Image(systemName: "checkmark")
-                        .foregroundStyle(Color(.black))
-                        .font(Font.system(size: 24))
-                        .padding(16)
-                        .background(
-                            Circle()
-                                .fill(Color.gray.opacity(0.15))
-                        )
+                    Image(
+                        systemName: !isRecording ? "microphone.fill" : "square.fill"
+                    )
+                    .foregroundStyle(Color(.white))
+                    .font(Font.system(size: 32))
+                    .padding(18)
+                    .background(
+                        Circle()
+                            .fill(Color.interactive)
+                    )
                 }
             }
-            .frame(maxHeight: .infinity)
         }
+        .padding(.horizontal, 24)
     }
 }
 

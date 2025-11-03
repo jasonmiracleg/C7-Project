@@ -48,7 +48,6 @@ struct ContextScenarioView: View {
             .foregroundStyle(Color.white)
             .fullScreenCover(isPresented: $showGameplaySheet) {
                 GameplaySheetView()
-                    .padding(.horizontal, 24)
             }
         }
         .padding(.horizontal, 24)
