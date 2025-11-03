@@ -19,7 +19,7 @@ struct ContextScenarioView: View {
             Text(text)
                 .padding(12)
                 .background(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: 12)
                         .fill(Color.gray.opacity(0.2))
                 )
             Spacer()
