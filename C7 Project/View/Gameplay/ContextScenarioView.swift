@@ -22,6 +22,16 @@ struct ContextScenarioView: View {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color.gray.opacity(0.2))
                 )
+                .overlay(alignment: .bottom) {
+                    Triangle()
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(width:30, height: 20)
+                        .offset(x: -40, y: 20)
+                }
+            Image("Context")
+                .resizable()
+                .frame(width: 350, height: 350)
+                .padding(.top, -24)
             Spacer()
             Button(action: {
                 showGameplaySheet = true
