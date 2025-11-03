@@ -23,12 +23,14 @@ struct ScenariosView: View {
                 VStack(alignment: .leading) {
                     ForEach(scenariosData) { scenario in
                         ScenarioCard(scenario: scenario)
-                            .padding(.bottom, 4)
+                            .padding(.bottom, 8)
                     }
                 }
-                .padding(.horizontal, 20)
+                .padding(.leading, 32)
+                .padding(.trailing, 32)
             }
             .navigationTitle("Scenarios")
+            .scrollIndicators(.hidden)
         }
     }
 }
