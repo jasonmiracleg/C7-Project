@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContextScenarioView: View {
+    @Environment(\.dismiss) var dismiss
     @State private var showGameplaySheet = false
     
     var text: String =
@@ -15,6 +16,18 @@ struct ContextScenarioView: View {
 
     var body: some View {
         VStack {
+            HStack(alignment: VerticalAlignment.center) {
+                Spacer()
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 24))
+                        .foregroundStyle(.black)
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.glass)
+            }
             Spacer()
             Text(text)
                 .padding(12)

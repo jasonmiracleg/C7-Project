@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ScenariosView: View {
+    @State private var showContextScenario = false
     
     let scenariosData: [Scenario] = [
         Scenario(title: "Presenting", description: "Practice your pitch and presentation skills in time-limited scenarios.", imageName: "Presenting", duration: 9),
@@ -22,13 +23,21 @@ struct ScenariosView: View {
             ScrollView {
                 VStack(alignment: .leading) {
                     ForEach(scenariosData) { scenario in
-                        ScenarioCard(scenario: scenario)
-                            .padding(.bottom, 4)
+                        Button(action: {
+                            showContextScenario.toggle()
+                        }) {
+                            ScenarioCard(scenario: scenario)
+                                .padding(.bottom, 4)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.horizontal, 20)
             }
             .navigationTitle("Scenarios")
+        }
+        .fullScreenCover(isPresented: $showContextScenario) {
+            ContextScenarioView()
         }
     }
 }
@@ -36,3 +45,5 @@ struct ScenariosView: View {
 #Preview {
     ScenariosView()
 }
+
+
