@@ -20,3 +20,4 @@ Carthage/Build/
 # Other
 *.swp
 *.bak
+/C7 Project/Config
