@@ -8,23 +8,42 @@
 import SwiftUI
 
 struct EvaluationItemCard: View {
-    let itemNumber: Int
     let promptText: String
     let spokenText: AttributedString
-    @Binding var showingPopup: Bool
-    @Binding var popupCorrection: String
+    
+    @Binding var showingPronunciationPopup: Bool
+    @Binding var pronunciationCorrection: String
+    @Binding var showingGrammarPopup: Bool
+    @Binding var grammarCorrection: String
+    
+    // Initializer for Pronunciation
+    init(promptText: String,
+         spokenText: AttributedString,
+         showingPronunciationPopup: Binding<Bool>,
+         pronunciationCorrection: Binding<String>) {
+        self.promptText = promptText
+        self.spokenText = spokenText
+        self._showingPronunciationPopup = showingPronunciationPopup
+        self._pronunciationCorrection = pronunciationCorrection
+        self._showingGrammarPopup = .constant(false)
+        self._grammarCorrection = .constant("")
+    }
+    
+    // Initializer for Grammar
+    init(promptText: String,
+         spokenText: AttributedString,
+         showingGrammarPopup: Binding<Bool>,
+         grammarCorrection: Binding<String>) {
+        self.promptText = promptText
+        self.spokenText = spokenText
+        self._showingPronunciationPopup = .constant(false)
+        self._pronunciationCorrection = .constant("")
+        self._showingGrammarPopup = showingGrammarPopup
+        self._grammarCorrection = grammarCorrection
+    }
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            // Numbered Circle
-            Text("\(itemNumber)")
-                .font(.system(size: 16, weight: .bold))
-                .foregroundColor(.white)
-                .frame(width: 28, height: 28)
-                .background(Circle().fill(Color.red))
-                .padding(.top, 2)
-            
-            // Text Content
             VStack(alignment: .leading, spacing: 8) {
                 Text(promptText)
                     .font(.headline)
@@ -40,18 +59,35 @@ struct EvaluationItemCard: View {
                     .environment(\.openURL, OpenURLAction { url in
                         if url.scheme == "popup" {
                             let correction = String(url.host ?? "error")
-                            popupCorrection = correction
-                            showingPopup = true
+                            pronunciationCorrection = correction
+                            showingPronunciationPopup = true
                             return .handled
+                        } else if url.scheme == "grammar" {
+                            // Parse query item "text" using URLComponents
+                            if let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+                               let value = components.queryItems?.first(where: { $0.name == "text" })?.value,
+                               !value.isEmpty {
+                                grammarCorrection = value
+                                showingGrammarPopup = true
+                                return .handled
+                            } else {
+                                // Fallbacks for older links (host or lastPathComponent)
+                                let hostOrPath = url.host ?? url.lastPathComponent
+                                let decoded = hostOrPath.removingPercentEncoding ?? hostOrPath
+                                if !decoded.isEmpty {
+                                    grammarCorrection = decoded
+                                    showingGrammarPopup = true
+                                    return .handled
+                                }
+                            }
+                            return .discarded
                         }
                         return .discarded
                     })
             }
         }
         .padding()
-        .background(Color(UIColor.systemBackground))
+        .background(Color(UIColor.systemGray6))
         .cornerRadius(12)
     }
 }
-
-
