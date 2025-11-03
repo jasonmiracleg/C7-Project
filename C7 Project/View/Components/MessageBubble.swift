@@ -19,9 +19,9 @@ struct MessageBubble: View {
                 .padding(.vertical, 10)
                 .padding(.horizontal, 14)
                 .background(
-                    RoundedRectangle(cornerRadius: 14)
-                        .fill(isSent ? Color.blue : Color.gray.opacity(0.2))
+                    isSent ? Color.blue : Color.gray.opacity(0.2)
                 )
+                .clipShape(.rect(topLeadingCorner: 16, topTrailingCorner: 16, bottomLeadingCorner: Edge.Corner.Style(integerLiteral: (isSent ? 16 : 0)), bottomTrailingCorner: Edge.Corner.Style(integerLiteral: (isSent ? 0 : 16))))
                 .foregroundColor(isSent ? .white : .primary)
             if !isSent { Spacer() }
         }
