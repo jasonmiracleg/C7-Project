@@ -32,9 +32,11 @@ struct ScenariosView: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .padding(.horizontal, 20)
+                .padding(.leading, 32)
+                .padding(.trailing, 32)
             }
             .navigationTitle("Scenarios")
+            .scrollIndicators(.hidden)
         }
         .fullScreenCover(isPresented: $showContextScenario) {
             ContextScenarioView()

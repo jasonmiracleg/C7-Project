@@ -9,16 +9,15 @@ import SwiftUI
 
 struct ScenarioCard: View {
     let scenario: Scenario
-
+    
     var body: some View {
         HStack(spacing: 0) {
             Image(scenario.imageName)
                 .resizable()
+                .frame(width: 120, height: 90)
                 .aspectRatio(contentMode: .fill)
-                .frame(width: 100, height: 100)
-                .padding(.leading, 4)
-
-
+//                .background(Color.blue)
+            
             VStack(alignment: .leading, spacing: 8) {
                 Text(scenario.title)
                     .font(.title3.bold())
@@ -29,22 +28,21 @@ struct ScenarioCard: View {
                     .padding(.bottom, 8)
                     .padding(.top, -4)
                     .multilineTextAlignment(.leading)
-                                    .lineLimit(nil)
-                                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
                 
-                    HStack(spacing: 4) {
-                        Image(systemName: "clock")
-                            .font(.caption)
-                        Text("\(scenario.duration) minutes")
-                            .font(.caption)
-                    }
-                    .foregroundColor(.gray)
-                
+                HStack(spacing: 4) {
+                    Image(systemName: "clock")
+                        .font(.callout)
+                    Text("\(scenario.duration) minutes")
+                        .font(.callout)
+                }
+                .foregroundColor(.gray)
             }
-//            .padding(8)
-            .frame(width: 180)
+            .padding(.leading, 16)
         }
-        .frame(width: 330, height: 150)
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.backgroundComponent)
         .cornerRadius(16)
     }
