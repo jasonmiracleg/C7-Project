@@ -47,35 +47,16 @@ struct EvaluationView: View {
         }
         .navigationTitle("Evaluation")
         .navigationBarTitleDisplayMode(.inline)
-        .overlay(
-            Group {
-                if showingPronunciationPopup || showingGrammarPopup {
-                    Color.black.opacity(0.4)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            showingPronunciationPopup = false
-                            showingGrammarPopup = false
-                        }
-                }
-                
-                if showingPronunciationPopup {
-                    PronunciationPopup(
-                        correctionText: pronunciationCorrection,
-                        isPresented: $showingPronunciationPopup
-                    )
-                    .transition(.scale.combined(with: .opacity))
-                }
-                
-                if showingGrammarPopup, let detail = selectedGrammarDetail {
-                    GrammarPopup(
-                        detail: detail,
-                        isPresented: $showingGrammarPopup
-                    )
-                    .transition(.scale.combined(with: .opacity))
-                }
-            }
-            .animation(.easeInOut, value: showingPronunciationPopup || showingGrammarPopup)
-        )
+        .sheet(item: $selectedGrammarDetail) { detail in
+            DetailEvaluationModal(detail: detail)
+        }
+        .sheet(isPresented: $showingPronunciationPopup) {
+            PronunciationPopup(
+                correctionText: $pronunciationCorrection,
+                isPresented: $showingPronunciationPopup
+            )
+            .presentationDetents([.medium])
+        }
     }
 }
 

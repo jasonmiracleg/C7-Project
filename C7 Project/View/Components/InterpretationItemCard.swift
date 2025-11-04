@@ -44,17 +44,6 @@ struct InterpretationItemCard: View {
                 
                 Spacer()
                 
-//                if interpretationPoints.count > 0 {
-//                    Text("\(interpretationPoints.count)")
-//                        .font(.caption.weight(.semibold))
-//                        .foregroundColor(.white)
-//                        .padding(.horizontal, 6)
-//                        .padding(.vertical, 2)
-//                        .background(
-//                            Capsule().fill(Color.accentColor)
-//                        )
-//                        .accessibilityLabel("\(interpretationPoints.count) points")
-//                }
                 
                 Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
                     .font(.headline)
@@ -70,7 +59,7 @@ struct InterpretationItemCard: View {
             )
             .contentShape(Rectangle())
             .onTapGesture {
-                withAnimation(.spring(response: 0.28, dampingFraction: 0.9)) {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.9)) {
                     isExpanded.toggle()
                 }
             }
@@ -92,7 +81,7 @@ struct InterpretationItemCard: View {
                     }
                 }
                 .padding(.leading, 4)
-                .transition(.opacity.combined(with: .move(edge: .top)))
+                .transition(.move(edge: .leading).combined(with: .opacity))
             }
         }
         .padding(14)
