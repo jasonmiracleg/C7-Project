@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct GrammarPopup: View {
-    let correctionText: String
+    let detail: GrammarEvaluationDetail
     @Binding var isPresented: Bool
+    
+    @State private var showingDetailModal = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // 1. Header with Title and Close Button
             HStack {
                 Text("The correct grammar would be:")
                     .font(.headline)
@@ -28,16 +29,15 @@ struct GrammarPopup: View {
                 }
             }
             
-            // 2. Grammar Correction and "See Details"
             HStack(spacing: 12) {
-                Text(correctionText)
-                    .font(.title3.weight(.medium))
+                Text("\"\(detail.correctedSentence)\"")
+                    .font(.title3.weight(.regular))
                     .italic()
                 
                 Spacer()
                 
                 Button(action: {
-                    
+                    showingDetailModal = true
                 }) {
                     Text("See Details")
                         .font(.headline)
@@ -50,6 +50,12 @@ struct GrammarPopup: View {
         .background(Color(UIColor.systemBackground))
         .cornerRadius(16)
         .shadow(radius: 10)
-        .padding(.horizontal, 30) 
+        .padding(.horizontal, 30)
+        .fullScreenCover(isPresented: $showingDetailModal) {
+            DetailEvaluationModal(
+                detail: detail,
+                isPresented: $showingDetailModal
+            )
+        }
     }
 }

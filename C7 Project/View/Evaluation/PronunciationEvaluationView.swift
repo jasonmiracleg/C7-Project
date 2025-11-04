@@ -18,7 +18,8 @@ struct PronunciationEvaluationView: View {
             VStack(spacing: 16) {
                 EvaluationHeaderCard(
                     title: "Incorrect Pronunciation",
-                    subtitle: "20/130 words"
+                    subtitle: "20/130 words",
+                    color: Color.blue
                 )
                 
                 EvaluationItemCard(
