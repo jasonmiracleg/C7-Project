@@ -21,6 +21,7 @@ These are rules you must adhere to:
 nonisolated func interpretSystemPrompt(forTask task: String) -> String {
     return """
     Your task is to summarize what the user said into concise bullet points. Nothing more than the bullet points and no information left; share all the information that you received from the user in the specific text.
+    Make each bullet point have a clear subject of who. If the user is doing something, refer to the user as You
     
     TEXT:
     "\(task)
