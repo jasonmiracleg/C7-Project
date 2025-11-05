@@ -1,0 +1,137 @@
+{
+  "Presenting": [
+    {
+      "mainTopic": "Pitching a new project to get a limited budget",
+      "storyContext": "You've worked overtime for 3 weeks on this project proposal. Today, you present it to the budget committee. Their budget is tight, and you know 5 other proposals are also competing.",
+      "initialPrompt": "Thank you for coming. We've read the summary, but we have 5 other proposals. So, what makes your project the one we should invest in?"
+    },
+    {
+      "mainTopic": "Giving a concise, impromptu update on your work under pressure",
+      "storyContext": "The CEO of your company is doing an impromptu company visit. Apparently, they are laying off some of the workforce for efficiency. He stops at your desk to ask about your work.",
+      "initialPrompt": "So, can you tell me about what you worked on this past week?"
+    },
+    {
+      "mainTopic": "Presenting your personal performance and accomplishments",
+      "storyContext": "It's your annual performance review. Your manager asked you to \"come prepared\" to present your biggest accomplishments and challenge areas from the past year.",
+      "initialPrompt": "Welcome. As you know, this is your annual review. To start, how would you summarize your key achievements from the past year?"
+    },
+    {
+      "mainTopic": "Presenting a report/update to an unhappy external partner/vendor",
+      "storyContext": "A representative from a key partner/vendor is visiting. They are not happy with the recent collaboration. You've been tasked with presenting a status report and fixing the relationship.",
+      "initialPrompt": "We flew all the way here because, frankly, the results aren't what we expected. What exactly is going on, and how do you plan to get this partnership back on track?"
+    },
+    {
+      "mainTopic": "Announcing a project/task delay to your team",
+      "storyContext": "You are responsible for a key task that many people are waiting for. Due to an unexpected problem, it will be one week late. You must now announce this at the weekly team meeting.",
+      "initialPrompt": "Alright, let's go around the room for status updates. You're up first. What's the status on that key task, and are we still on track for the deadline?"
+    }
+  ],
+  "Collaborating": [
+    {
+      "mainTopic": "Collaborating with another department you don't usually work with",
+      "storyContext": "You need important data from another department to finish your project. Your usual contact person is on leave. You are calling someone you don't know to ask for help.",
+      "initialPrompt": "Hi, this is Chris speaking. I'm not who usually handles this, and I'm very busy today. What is this regarding, and why is it so urgent?"
+    },
+    {
+      "mainTopic": "Contributing ideas in a team brainstorming session",
+      "storyContext": "Your team is in a meeting to find a solution for a persistent problem. Your manager is at the whiteboard. \"We need fresh ideas,\" she says.",
+      "initialPrompt": "Okay, we all know the problem. We need some new solutions, and no idea is a bad idea. Who wants to start us off? What are your thoughts?"
+    },
+    {
+      "mainTopic": "Following up with an unresponsive colleague on an urgent deadline",
+      "storyContext": "You are waiting for information from a colleague to finish your work. The deadline is tomorrow. He hasn't replied to your two emails. You see him in the pantry.",
+      "initialPrompt": "(This is Dani) Oh, hey! Sorry, I've been swamped with meetings all morning. What's up?"
+    },
+    {
+      "mainTopic": "Negotiating deadlines and priorities with your manager",
+      "storyContext": "Your manager just assigned you a new \"urgent\" task. The problem is, you are already at full capacity with two other high-priority projects. You need to discuss this with her.",
+      "initialPrompt": "Hi, I just sent you that new task. I really need it done by Friday. Is that going to be a problem for your current workload?"
+    },
+    {
+      "mainTopic": "Asking a busy senior colleague for help when you are overloaded",
+      "storyContext": "You are completely swamped. You have two urgent deadlines and realize you can't finish both. You need to ask a senior colleague, who looks very busy, for help.",
+      "initialPrompt": "(The AI is the busy senior colleague) \"Hi there, I'm just running to a meeting. You look a bit stressed. Is everything okay with your tasks?”"
+    }
+  ],
+  "Reporting": [
+    {
+      "mainTopic": "Reporting your weekly progress and blockers to your manager",
+      "storyContext": "It's your weekly 1-on-1 meeting with your manager. She just opened her notebook and is looking at you, ready to start.",
+      "initialPrompt": "So, let's kick this off. Can you start by reporting on your progress for your main tasks this week? Are there any blockers?"
+    },
+    {
+      "mainTopic": "Reporting the status of a project in a team meeting",
+      "storyContext": "You're in the weekly project status meeting. Your project manager is looking at the task list on the screen. It's your turn to report.",
+      "initialPrompt": "Alright, let's move to Task 3.4. That's assigned to you. What is the current status, and are we still on track to meet the deadline?"
+    },
+    {
+      "mainTopic": "Reporting the final results of a task or analysis",
+      "storyContext": "You just finished analyzing the employee satisfaction survey. Your boss, who is in a hurry, stops by your desk.",
+      "initialPrompt": "Hey, I saw you finished the survey analysis. I'm running to a meeting, so I don't have time to read the report. What are the top 3 key takeaways?"
+    },
+    {
+      "mainTopic": "Reporting that you will not be able to meet a deadline",
+      "storyContext": "You've been working hard, but you realize you won't be able to finish an important report by the deadline. You need to send a message to your manager to let her know.",
+      "initialPrompt": "Hi. I just saw your message. What's the reason for the delay, and when can I expect to have the report?"
+    },
+    {
+      "mainTopic": "Reporting your team's progress to a senior leader",
+      "storyContext": "A Director is visiting your office. Your manager is out sick, so you've been asked to step in and give the 2-minute progress report for your team.",
+      "initialPrompt": "Thanks for stepping in. We don't know each other well. Can you give me the high-level summary of what your team has achieved this quarter?"
+    }
+  ],
+  "Networking": [
+    {
+      "mainTopic": "Building rapport with an important client while your boss is away",
+      "storyContext": "A super rich, super important client is visiting your company office today. Your boss is away for another super important meeting and has put you in charge of entertaining this client in the meantime.",
+      "initialPrompt": "My flight was fine, thank you. Your office is lovely. So, your boss tells me you're a key part of the team. What exactly is it that you do here?"
+    },
+    {
+      "mainTopic": "Making a memorable impression on an industry expert",
+      "storyContext": "You just watched an amazing keynote presentation at a conference. The speaker is now alone for a moment by the coffee station. This is your chance.",
+      "initialPrompt": "Oh, thank you, I'm glad you enjoyed it. It's always a packed house. What was your biggest takeaway from the talk?"
+    },
+    {
+      "mainTopic": "Gracefully joining a group conversation already in progress",
+      "storyContext": "At an event, you see two influential people talking. You wait for a brief pause in their conversation and walk over. One of them turns to you.",
+      "initialPrompt": "Oh, hello. We were just discussing the speaker's points on efficiency. What did you think of the presentation?"
+    },
+    {
+      "mainTopic": "Networking with a peer from another (competitor) company",
+      "storyContext": "You're at a local industry meetup. You sit down next to someone who works at a competitor company you admire. They turn to you.",
+      "initialPrompt": "This is a pretty good turnout. Is this your first time at this meetup? What kind of work do you do over at your company?"
+    },
+    {
+      "mainTopic": "Introducing yourself to a manager from another department",
+      "storyContext": "It's the annual company mixer. You're standing by yourself. A manager from another department (one you're interested in) walks up to you with a smile.",
+      "initialPrompt": "It's a great event, isn't it? I don't think we've officially met. I'm Joni from Marketing. What about you? What part of the business are you in?"
+    }
+  ],
+  "Explaining": [
+    {
+      "mainTopic": "Explaining your role and value to a new employee",
+      "storyContext": "It's a new hire's first day on your team. Your manager has asked you to have a chat with them and \"explain what you do.”",
+      "initialPrompt": "Hi, it's nice to meet you! I'm still trying to understand what everyone does. Can you explain to me what your main responsibilities are on the team?"
+    },
+    {
+      "mainTopic": "Explaining a multi-step company process to a confused colleague",
+      "storyContext": "A colleague from another department is confused about how to submit a new request in the system. They send you a message, knowing you use it often.",
+      "initialPrompt": "Hey, I'm so lost. I'm trying to submit a request, but this new portal is confusing. Can you just explain to me, step-by-step, what I'm supposed to do?"
+    },
+    {
+      "mainTopic": "Explaining the root cause of a mistake you made",
+      "storyContext": "Your manager found an error in your work from last week. She's not angry, but she wants to know why it happened so it doesn't happen again.",
+      "initialPrompt": "I've corrected the error, so don't worry. But I want to understand the root cause. Can you walk me through your process and explain what happened?"
+    },
+    {
+      "mainTopic": "Explaining your career aspirations to your manager",
+      "storyContext": "During your performance review, your manager wants to discuss your future. \"I want to help you grow,\" she says.",
+      "initialPrompt": "We've talked about this past year. Now, let's look forward. Can you explain to me what your career goals are for the next 2-3 years?"
+    },
+    {
+      "mainTopic": "Explaining a new, unpopular company policy to your peers",
+      "storyContext": "The company just announced a new, unpopular policy (e.g., return-to-office). At lunch, your colleagues are complaining and asking you questions.",
+      "initialPrompt": "This new policy is terrible. It makes no sense. Did you understand the email? Can you explain why the company is doing this?"
+    }
+  ]
+}

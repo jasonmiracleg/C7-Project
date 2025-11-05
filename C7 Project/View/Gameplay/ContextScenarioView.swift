@@ -8,12 +8,16 @@
 import SwiftUI
 
 struct ContextScenarioView: View {
-    @Environment(\.dismiss) var dismiss
+    let scenario: Scenario
+    
+    @StateObject private var viewModel = GameplayViewModel()
+    
+    @State private var selectedStory: StoryDetail?
+    
     @State private var showGameplaySheet = false
     
-    var text: String =
-        "The CEO of your company is doing an impromptu company visit. Apparently they are laying off some of the workforce for efficiency. He is asking everyone to tell him about what they worked on in the past week."
-
+    @Environment(\.dismiss) private var dismiss
+    
     var body: some View {
         VStack {
             HStack(alignment: VerticalAlignment.center) {
@@ -28,46 +32,68 @@ struct ContextScenarioView: View {
                 }
                 .buttonStyle(.glass)
             }
+            
             Spacer()
-            Text(text)
-                .padding(12)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.gray.opacity(0.2))
-                )
-                .overlay(alignment: .bottom) {
-                    Triangle()
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(width:30, height: 20)
-                        .offset(x: -40, y: 20)
+            
+            if let story = selectedStory {
+                Text(story.storyContext)
+                    .padding(12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.gray.opacity(0.2))
+                    )
+                    .overlay(alignment: .bottom) {
+                        Triangle()
+                            .fill(Color.gray.opacity(0.2))
+                            .frame(width:30, height: 20)
+                            .offset(x: -40, y: 20)
+                    }
+                Image("Context")
+                    .resizable()
+                    .frame(width: 350, height: 350)
+                    .padding(.top, -24)
+                Spacer()
+                
+                // Tombol Mulai
+                Button("START YOUR CONVERSATION") {
+                    showGameplaySheet = true
                 }
-            Image("Context")
-                .resizable()
-                .frame(width: 350, height: 350)
-                .padding(.top, -24)
-            Spacer()
-            Button(action: {
-                showGameplaySheet = true
-            }) {
-                Text("START YOUR CONVERSATION")
-                    .font(.headline)
-            }
-            .padding(24)
-            .frame(maxWidth: .infinity)
-            .background(
-                Capsule()
-                    .fill(Color.accentColor.opacity(0.8))
-            )
-            .foregroundStyle(Color.white)
-            .fullScreenCover(isPresented: $showGameplaySheet) {
-                GameplaySheetView()
+                .font(.headline)
+                .padding(24)
+                .frame(maxWidth: .infinity)
+                .background(
+                    Capsule()
+                        .fill(Color.accentColor.opacity(0.8))
+                )
+                .foregroundStyle(Color.white)
+                
+            } else {
+                ProgressView("Loading Story...")
+                Text(scenario.title)
             }
         }
         .padding(.horizontal, 24)
-
+        .onAppear {
+            if selectedStory == nil {
+                self.selectedStory = viewModel.getRandomStory(for: scenario.title)
+            }
+        }
+        .fullScreenCover(isPresented: $showGameplaySheet) {
+            if let story = selectedStory {
+                GameplaySheetView(story: story)
+            }
+        }
+        .padding(.horizontal, 24)
     }
 }
 
 #Preview {
-    ContextScenarioView()
+    let sampleScenario = Scenario(
+        title: "Presenting",
+        description: "Practice your pitch...",
+        imageName: "Presenting",
+        duration: 9
+    )
+    
+    ContextScenarioView(scenario: sampleScenario)
 }
