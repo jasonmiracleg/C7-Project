@@ -11,6 +11,8 @@ struct GameplaySheetView: View {
     @Environment(\.dismiss) var dismiss
     @State private var isRecording = false
     @State private var isFinished = false
+    
+    let story: StoryDetail
 
     var body: some View {
         NavigationStack {
@@ -25,9 +27,12 @@ struct GameplaySheetView: View {
                                 .font(.subheadline)
                         }
                         Spacer()
+                        
                         Text("Gameplay")
                             .font(.title2)
+                        
                         Spacer()
+                        
                         Button(action: {
                             dismiss()
                         }) {
@@ -38,16 +43,16 @@ struct GameplaySheetView: View {
                         }
                         .buttonStyle(.glass)
                     }
-                    Text("Big Shot")
-                        .font(.title)
+                    
+                    Text(story.mainTopic)
+                        .font(.title3)
                         .fontWeight(.bold)
                 }
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
                         MessageBubble(
-                            text:
-                                "So, can you tell me about what you worked on this past week",
+                            text: story.initialPrompt,
                             isSent: false
                         )
                         MessageBubble(
@@ -155,5 +160,11 @@ struct GameplaySheetView: View {
 }
 
 #Preview {
-    GameplaySheetView()
+    GameplaySheetView(
+        story: StoryDetail(
+            mainTopic: "Pitching a new project",
+            storyContext: "Ini adalah konteks cerita...",
+            initialPrompt: "Ini adalah pertanyaan pertama untuk preview."
+        )
+    )
 }

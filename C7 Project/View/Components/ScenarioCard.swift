@@ -16,12 +16,11 @@ struct ScenarioCard: View {
                 .resizable()
                 .frame(width: 120, height: 90)
                 .aspectRatio(contentMode: .fill)
-//                .background(Color.blue)
             
             VStack(alignment: .leading, spacing: 8) {
                 Text(scenario.title)
                     .font(.title3.bold())
-                
+    
                 Text(scenario.description)
                     .font(.callout)
                     .foregroundColor(.gray)
@@ -33,7 +32,6 @@ struct ScenarioCard: View {
                 
                 HStack(spacing: 4) {
                     Image(systemName: "clock")
-                        .font(.callout)
                     Text("\(scenario.duration) minutes")
                         .font(.callout)
                 }
@@ -41,14 +39,14 @@ struct ScenarioCard: View {
             }
             .padding(.leading, 16)
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .frame(maxWidth: .infinity, minHeight: 170, alignment: .leading)
         .background(Color.backgroundComponent)
-        .cornerRadius(16)
+        .cornerRadius(12)
     }
 }
 
-#Preview {
+#Preview("ScenarioCard") {
     let sampleScenario = Scenario(
         title: "Presenting",
         description: "Practice your pitch and presentation skills in time-limited scenarios",
@@ -56,7 +54,7 @@ struct ScenarioCard: View {
         duration: 9
     )
     
-    return ScenarioCard(scenario: sampleScenario)
+    ScenarioCard(scenario: sampleScenario)
         .padding()
         .background(Color(.systemGroupedBackground))
 }

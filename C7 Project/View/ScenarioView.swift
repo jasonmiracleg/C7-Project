@@ -4,12 +4,12 @@
 //
 //  Created by Maria Angelica Vinesytha Chandrawan on 01/11/25.
 //
-
 import SwiftUI
 
 struct ScenariosView: View {
-    @State private var showContextScenario = false
+    @State private var selectedScenario: Scenario?
     
+
     let scenariosData: [Scenario] = [
         Scenario(title: "Presenting", description: "Practice your pitch and presentation skills in time-limited scenarios.", imageName: "Presenting", duration: 9),
         Scenario(title: "Collaborating", description: "Work together with team members to achieve common goals.", imageName: "Collaborating", duration: 6),
@@ -24,7 +24,7 @@ struct ScenariosView: View {
                 VStack(alignment: .leading) {
                     ForEach(scenariosData) { scenario in
                         Button(action: {
-                            showContextScenario.toggle()
+                            selectedScenario = scenario
                         }) {
                             ScenarioCard(scenario: scenario)
                                 .padding(.bottom, 4)
@@ -32,14 +32,13 @@ struct ScenariosView: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .padding(.leading, 32)
-                .padding(.trailing, 32)
+                .padding()
             }
             .navigationTitle("Scenarios")
             .scrollIndicators(.hidden)
         }
-        .fullScreenCover(isPresented: $showContextScenario) {
-            ContextScenarioView()
+        .fullScreenCover(item: $selectedScenario) { scenario in
+            ContextScenarioView(scenario: scenario)
         }
     }
 }
@@ -47,5 +46,3 @@ struct ScenariosView: View {
 #Preview {
     ScenariosView()
 }
-
-
