@@ -10,9 +10,10 @@ struct InterpretationItemCard: View {
     
     let promptText: String
     let spokenText: String
-    let interpretationPoints: [String]
+    let interpretedText: InterpretedText?
     
     @State private var isExpanded: Bool = false
+    @State private var isInterpreted: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -66,23 +67,39 @@ struct InterpretationItemCard: View {
             
             // Expanded points
             if isExpanded {
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(interpretationPoints, id: \.self) { point in
-                        HStack(alignment: .top, spacing: 8) {
-                            Image(systemName: "circle.fill")
-                                .font(.system(size: 6))
-                                .foregroundColor(.secondary)
-                                .padding(.top, 6)
-                            Text(point)
-                                .font(.body)
-                                .foregroundColor(.primary)
-                                .fixedSize(horizontal: false, vertical: true)
+                if let interpretedText = interpretedText {
+                    // ✅ Show interpreted points
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(interpretedText.points, id: \.self) { point in
+                            HStack(alignment: .top, spacing: 8) {
+                                Image(systemName: "circle.fill")
+                                    .font(.system(size: 6))
+                                    .foregroundColor(.secondary)
+                                    .padding(.top, 6)
+                                Text(point)
+                                    .font(.body)
+                                    .foregroundColor(.primary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
                         }
                     }
+                    .padding(.leading, 4)
+                    .transition(.move(edge: .leading).combined(with: .opacity))
+                } else {
+                    // 🌀 Show loading placeholder when interpretedText is nil
+                    VStack(spacing: 12) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                        Text("Interpreting...")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 100)
+                    .transition(.opacity)
                 }
-                .padding(.leading, 4)
-                .transition(.move(edge: .leading).combined(with: .opacity))
             }
+
+
         }
         .padding(14)
         .background(Color(UIColor.systemGray6))
