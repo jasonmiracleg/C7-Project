@@ -14,20 +14,23 @@ class GrammarTestViewModel {
     // --- Network State ---
     var serverStatus: String = "Idle"
     private var networkManager: NetworkManager
-    var flaggingResponse: String = ""
-    var isFlagging: Bool = false
     
     // --- On-Device Grammar State ---
     var inputText: String = """
-        I visit a cafe new last weekend with my friends. The place very nice and have many decoration beautiful. I see two cat sleeping near the window, and they so cute. The coffee good, but the cake a little too sweet for me. I think it is good place to relax with some friend on Saturday.
+    My new colleague's name is Budi. He is a smart man and also very friendly. He always helps me when I have problems with my computer. He speaks English very well, so we can communicate easily. I think he is a nice person and easy to work with. Everybody in the office likes him because he always smiles.
     """
     var correctedText: String = ""
+    var validatedFlags: [ErrorFlag] = [] // NEW: To store semantic flags
     var isCheckingGrammar: Bool = false
-    private let grammarAnalyst: GrammarAnalyst // Instance of the actor
+    private let grammarAnalyst: GrammarAnalyst
+    
+    // --- API Flagging State ---
+    var flagApiResponse: String = ""
+    var isFlaggingApi: Bool = false
     
     init(networkManager: NetworkManager = .shared) {
         self.networkManager = networkManager
-        self.grammarAnalyst = GrammarAnalyst() // Initialize the analyst
+        self.grammarAnalyst = GrammarAnalyst()
     }
     
     // --- Network Functions ---
@@ -45,32 +48,42 @@ class GrammarTestViewModel {
     }
     
     @MainActor
-    func runFlagErrors() async {
-        guard !isCheckingGrammar, !correctedText.isEmpty else { return }
+    func runApiFlagErrors() async {
+        guard !isFlaggingApi else { return }
         
-        isFlagging = true
-        flaggingResponse = "Flagging errors..."
+        isFlaggingApi = true
+        flagApiResponse = "Flagging errors via API..."
         do {
-            let response = try await networkManager.flagErrors(original: inputText, corrected: correctedText)
-            flaggingResponse = response
+            // This now uses the *final corrected text* from the full analysis
+            let response = try await networkManager.flagErrors(
+                original: inputText,
+                corrected: correctedText
+            )
+            flagApiResponse = response
         } catch {
-            flaggingResponse = "Error flagging errors: \(error.localizedDescription)"
+            flagApiResponse = "API Flagging Error: \(error.localizedDescription)"
         }
-        isFlagging = false
+        isFlaggingApi = false
     }
-
-    // --- On-Device Grammar Function ---
+    
+    // --- On-Device Grammar Function (UPDATED) ---
     @MainActor
-    func runGrammarCheck() async {
+    func runFullAnalysis() async {
         isCheckingGrammar = true
         correctedText = "Checking..."
-        flaggingResponse = "" // Clear previous flag response
+        validatedFlags = [] // Clear old flags
+        flagApiResponse = "" // Clear old API response
+        
         do {
-            // Call the actor's correctGrammar function
-            let result = try await grammarAnalyst.correctGrammar(text: inputText)
-            correctedText = result
+            // Call the main function on the analyst
+            let (finalCorrectedText, flags) = try await grammarAnalyst.runFullAnalysis(text: inputText)
+            
+            // Store both results
+            correctedText = finalCorrectedText
+            validatedFlags = flags
+            
         } catch {
-            correctedText = "Error correcting grammar: \(error.localizedDescription)"
+            correctedText = "Error during analysis: \(error.localizedDescription)"
         }
         isCheckingGrammar = false
     }

@@ -18,7 +18,7 @@ struct GrammarTestView: View {
                     
                     // --- Section 1: On-Device Grammar Check ---
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("On-Device Grammar Check")
+                        Text("On-Device Full Analysis")
                             .font(.title2.weight(.bold))
                         
                         Text("Input Text:")
@@ -33,11 +33,12 @@ struct GrammarTestView: View {
                         
                         Button(action: {
                             Task {
-                                await viewModel.runGrammarCheck()
+                                await viewModel.runFullAnalysis()
                             }
                         }) {
                             HStack {
-                                Text("1. Correct Grammar")
+                                // Updated button text
+                                Text("Run Full Analysis")
                                 if viewModel.isCheckingGrammar {
                                     ProgressView()
                                         .tint(.white)
@@ -51,60 +52,81 @@ struct GrammarTestView: View {
                         .cornerRadius(10)
                         .disabled(viewModel.isCheckingGrammar)
                         
-                        if !viewModel.correctedText.isEmpty {
-                            Text("Corrected Text:")
-                                .font(.headline)
-                            
-                            Text(viewModel.correctedText)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding()
-                                .background(Color(UIColor.systemGray5))
-                                .cornerRadius(8)
-                                .textSelection(.enabled)
-                            
-                            // --- NEW: Flag Errors Button ---
-                            Button(action: {
-                                Task {
-                                    await viewModel.runFlagErrors()
-                                }
-                            }) {
-                                HStack {
-                                    Text("2. Flag Errors (API Call)")
-                                    if viewModel.isFlagging {
-                                        ProgressView()
-                                            .tint(.white)
-                                    }
-                                }
-                                .frame(maxWidth: .infinity)
-                            }
-                            .padding()
-                            .background(viewModel.isFlagging || viewModel.isCheckingGrammar ? Color.gray : Color.green)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                            .disabled(viewModel.isFlagging || viewModel.isCheckingGrammar)
-                        }
+                        Text("Corrected Text:")
+                            .font(.headline)
                         
-                        // --- NEW: Flagging Response ---
-                        if !viewModel.flaggingResponse.isEmpty {
-                            Text("Flagging JSON Response:")
-                                .font(.headline)
-                            
-                            ScrollView(.vertical, showsIndicators: true) {
-                                Text(viewModel.flaggingResponse)
-                                    .font(.system(.caption, design: .monospaced))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding()
-                                    .background(Color(UIColor.systemGray5))
-                                    .cornerRadius(8)
-                                    .textSelection(.enabled)
+                        Text(viewModel.correctedText)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                            .background(Color(UIColor.systemGray5))
+                            .cornerRadius(8)
+                            .textSelection(.enabled)
+                        
+                        // --- NEW: Validated Flags Output ---
+                        Text("Validated Semantic Flags (\(viewModel.validatedFlags.count)):")
+                            .font(.headline)
+                            .padding(.top, 10)
+                        
+                        VStack(alignment: .leading) {
+                            if viewModel.validatedFlags.isEmpty {
+                                Text("No valid semantic flags found.")
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                ForEach(viewModel.validatedFlags, id: \.self) { flag in
+                                    Text(flag.description)
+                                        .padding(.vertical, 5)
+                                    Divider()
+                                }
                             }
-                            .frame(height: 200)
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(Color(UIColor.systemGray5))
+                        .cornerRadius(8)
+                        // --- End New Section ---
                     }
                     
                     Divider().padding(.vertical, 10)
                     
-                    // --- Section 2: API Server Health Check ---
+                    // --- Section 2: API Server Error Flagging ---
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("API Server Error Flagging")
+                            .font(.title2.weight(.bold))
+                        
+                        // This button now works with the text generated above
+                        Button(action: {
+                            Task {
+                                await viewModel.runApiFlagErrors()
+                            }
+                        }) {
+                            HStack {
+                                Text("Flag Errors (API)")
+                                if viewModel.isFlaggingApi {
+                                    ProgressView().tint(.white)
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                        .padding()
+                        .background(viewModel.isFlaggingApi ? Color.gray : Color.green.opacity(0.8))
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .disabled(viewModel.isFlaggingApi || viewModel.isCheckingGrammar || viewModel.correctedText.isEmpty)
+                        
+                        Text("API Response:")
+                            .font(.headline)
+                        
+                        Text(viewModel.flagApiResponse)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                            .background(Color(UIColor.systemGray5))
+                            .cornerRadius(8)
+                            .textSelection(.enabled)
+                    }
+                    
+                    Divider().padding(.vertical, 10)
+                    
+                    // --- Section 3: API Server Health Check ---
                     VStack(spacing: 10) {
                         Text("API Server Health Check")
                             .font(.title2.weight(.bold))
