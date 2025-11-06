@@ -8,16 +8,15 @@
 import Foundation
 import FoundationModels
 
-// MARK: - Stage 2 & 3: Zipped Semantic Analysis
 extension GrammarAnalyst {
+    // MARK: - Stage 2+3: Flag and Validate
     
-    /// This is the "Stage 2 & 3 combined" function.
-    /// It runs the full flagging and validation pipeline in parallel for all 3 categories.
+    /// Runs the full semantic analysis pipeline: flags in parallel, then validates each flag.
     func runSemanticAnalysis(on text: String) async throws -> [ErrorFlag] {
-        print("\n--- Analyst Stage 2+3: Zipped Flagging & Validation ---")
-
-        // 1. Run all 3 categories in parallel.
-        // Each function "zips" the flagging and validation process together.
+        print("\n--- Analyst Stage 2+3: Running Full Semantic Analysis ---")
+        
+        // Run all 3 categories in parallel.
+        // Each function flags AND validates its own category.
         async let calqueFlags = flagAndValidateCategory(
             flaggingSession: calqueFlaggingSession,
             validatorSession: calqueValidatorSession,
@@ -39,94 +38,137 @@ extension GrammarAnalyst {
             errorType: .Misselection
         )
         
-        // 2. Await and pool all results
-        let (calques, colls, misselections) = try await (calqueFlags, collocationFlags, misselectionFlags)
+        // Await and pool the results
+        let allValidatedFlags = try await (calqueFlags + collocationFlags + misselectionFlags)
         
-        let allValidFlags = calques + colls + misselections
-        print("\nValidation Complete. Confirmed \(allValidFlags.count) total valid flags.")
-        
-        for flag in allValidFlags {
-            print("\nFINAL VALID FLAG:\n\(flag)\n")
-        }
-        return allValidFlags
+        print("--- Semantic Analysis Complete. Total Valid Flags: \(allValidatedFlags.count) ---")
+        return allValidatedFlags
     }
     
-    /// This function "zips" the flagging and validation process for a single category.
-    /// It gets the *full* list of flags, *then* validates them sequentially.
-    private func flagAndValidateCategory(
+    /// Helper: Flags all errors for a category, then validates them one by one.
+    func flagAndValidateCategory(
         flaggingSession: LanguageModelSession,
         validatorSession: LanguageModelSession,
         prompt: String,
         errorType: SemanticErrorType
     ) async throws -> [ErrorFlag] {
 
-        print("[+] Starting Analysis for \(errorType.rawValue)")
+//        print("[+] Starting Analysis for \(errorType.rawValue)")
         var validatedFlags: [ErrorFlag] = []
 
-        // 1. Get the *full* array of flags. (Reverted from streamResponse)
-        
-        // STABILITY CHECK: Wait for the flagging session to be ready
+        // Delay operation if associated model is busy
         while flaggingSession.isResponding {
-            print("    Flagging session for \(errorType.rawValue) is busy. Waiting...")
+//            print("    FlaggingSession \(errorType.rawValue) is busy. Waiting...")
             try await Task.sleep(for: .milliseconds(100))
         }
         
-        print("    Flagging \(errorType.rawValue)...")
-        // Session is now guaranteed to be ready
+        // 1. Get the full, unfiltered array of error flags
+//        print("    Flagging \(errorType.rawValue)...")
         let allFlags = try await flaggingSession.respond(
             to: prompt,
-            generating: [ErrorFlag].self, // We get a complete array
+            generating: [ErrorFlag].self,
             options: GenerationOptions(sampling: .greedy, temperature: 0.5)
         ).content
         
-        print("    ...Flagging \(errorType.rawValue) complete. Found \(allFlags.count) potential flags. Now validating...")
+//        print("    ...Flagging \(errorType.rawValue) complete. Found \(allFlags.count) potential flags. Now validating...")
 
         // 2. Process each new flag serially with the validator
         for flag in allFlags {
-            
-            // This 'await' ensures we process one flag at a time,
-            // waiting for the validator to finish before starting the next.
             let isValid = try await validateFlag(flag, using: validatorSession)
             
+            // Print validator verdict
             if isValid {
-                print("    [VALID] \(errorType.rawValue): \(flag.sectionText)")
+//                print("    [VALID] \(errorType.rawValue): \(flag.sectionText)")
                 validatedFlags.append(flag)
             } else {
-                 print("    [INVALID] \(errorType.rawValue): \(flag.sectionText)")
+//                 print("    [INVALID] \(errorType.rawValue): \(flag.sectionText)")
             }
         }
         
-        print("[-] Finished Analysis for \(errorType.rawValue). Found \(validatedFlags.count) valid flags.")
+//        print("[-] Finished Analysis for \(errorType.rawValue). Found \(validatedFlags.count) valid flags.")
         return validatedFlags
     }
-    
-    /// Helper function to validate a single flag with the requested `isResponding` check.
+
+    /// Helper: Validates a single flag using its dedicated session.
     private func validateFlag(_ flag: ErrorFlag, using validatorSession: LanguageModelSession) async throws -> Bool {
-        
-        // 1. Fast exit for stylistic/identical flags
-        guard flag.sectionText.lowercased() != flag.correctedSectionText.lowercased() else {
-            print("        Validator: Skipping identical flag (no change).")
-            return false
+        // Delay operation if associated model is busy
+        while validatorSession.isResponding {
+//            print("    ValidatorSession for \(flag.errorType.rawValue) is busy. Waiting...")
+            try await Task.sleep(for: .milliseconds(100))
         }
 
-        // 2. STABILITY CHECK: Explicitly wait for the session to be available
-        // Corrected from isAvailable to isResponding
-        while validatorSession.isResponding {
-            print("        Validator: Session for \(flag.errorType.rawValue) is busy. Waiting...")
-            try await Task.sleep(for: .milliseconds(100)) // Wait 100ms
-        }
-        
-        // 3. Session is now available, proceed with validation
-        print("        Validator: Session is available. Validating '\(flag.sectionText)'...")
         let response = try await validatorSession.respond(
             to: validateFlagPrompt(flag: flag),
             generating: ValidatorResponse.self,
             options: GenerationOptions(sampling: .greedy, temperature: 0.5)
         )
         
-        // Log the validator's reasoning
-        print("        Validator Rationale: \(response.content.rationale)")
+        print("""
+        Error Flag:
+        \(flag)
+        ----------
+        Validation Verict:
+        \(response.content)
+        """)
         
         return response.content.isValid
+    }
+    
+    
+    // MARK: - DEBUG METHOD FOR FINE-TUNING
+
+    /// Runs *only* the semantic flagging stage, skipping validation.
+    func runSemanticFlaggingOnly(on text: String) async throws -> [ErrorFlag] {
+        print("\n--- Analyst Stage 2 (Tuning): Running Semantic Flagging ONLY ---")
+        
+        // Run all 3 categories in parallel.
+        async let calqueFlags = flagCategory(
+            flaggingSession: calqueFlaggingSession,
+            prompt: flagCalqueErrors(forTask: text),
+            errorType: .Calque
+        )
+        
+        async let collocationFlags = flagCategory(
+            flaggingSession: collocationFlaggingSession,
+            prompt: flagCollocationErrors(forTask: text),
+            errorType: .CollocationError
+        )
+        
+        async let misselectionFlags = flagCategory(
+            flaggingSession: misselectionFlaggingSession,
+            prompt: flagMisselectionErrors(forTask: text),
+            errorType: .Misselection
+        )
+        
+        // Await and pool the results
+        let allFlags = try await (calqueFlags + collocationFlags + misselectionFlags)
+        
+        print("--- Semantic Flagging Complete. Total Flags Found: \(allFlags.count) ---")
+        return allFlags
+    }
+    
+    /// Helper: Flags all errors for a category (no validation).
+    func flagCategory(
+        flaggingSession: LanguageModelSession,
+        prompt: String,
+        errorType: SemanticErrorType
+    ) async throws -> [ErrorFlag] {
+
+        print("[+] Starting Flagging for \(errorType.rawValue)")
+
+        // --- STABILITY CHECK ---
+        while flaggingSession.isResponding {
+            print("    FlaggingSession \(errorType.rawValue) is busy. Waiting...")
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        
+        let allFlags = try await flaggingSession.respond(
+            to: prompt,
+            generating: [ErrorFlag].self,
+            options: GenerationOptions(sampling: .greedy, temperature: 0.5)
+        ).content
+        
+        print("[-] Finished Flagging for \(errorType.rawValue). Found \(allFlags.count) flags.")
+        return allFlags
     }
 }
