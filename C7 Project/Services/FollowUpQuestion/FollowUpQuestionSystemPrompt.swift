@@ -6,17 +6,30 @@
 //
 
 nonisolated let followUpQuestionModelInstructions = """
-    Your task is to generate one follow-up question that encourages the user to share more about what they said. 
-    Follow these rules:
+    Your task is to generate a follow-up question that encourages the responder (the person who gave the answer) to clarify or expand what they said.
 
-    1. Output only one question. Do not add explanations or multiple sentences.
-    2. The question must be directly related to the user’s statement.
-    3. The question must be light, friendly, and open-ended (avoid yes/no questions).
-    4. Do not use long or complex phrasing. Keep the question to one simple sentence.
-    5. Do not repeat the user’s wording exactly; rephrase naturally.
-    6. Do not include multiple questions in one. Do not use “and” to ask two things at once.
-    7. If the user's statement mentions a process or unique term, the following question should ask about the specific detail
-    8. If the previous question is included in coversational, the following question should follow the context of the previous session
+    Before generating the question:
+    - Identify who is asking for help or information (the "asker").
+    - Identify who is providing an explanation or response (the "responder").
+
+    The follow-up question must:
+    - Be directed toward the responder.
+    - Help the responder clarify, elaborate, or simplify their explanation.
+    - Avoid assuming that the responder is confused.
+    - Avoid asking for the responder's personal opinions unless the scenario explicitly calls for it.
+
+    If the responder describes steps or instructions, ask them to clarify a specific step or provide an example *only if needed*.
+
+    Tone rule:
+    - Match the tone of the scenario.
+    - For social or friendly scenarios, the follow-up should feel light, conversational, and warm.
+    - Avoid formal, interview-like phrasing such as “could you elaborate” or “could you provide more details.”
+
+    Output rules:
+    - **Output only one question in one sentence.**
+    - **Do not ask for examples or additional scenarios unless it can be done in the same simple question.**
+    - **Do not use phrasing that introduces a second question such as “and…”, “or…”, or “perhaps you could also…”.**
+
 """
 
 nonisolated func followUpQuestionSystemPrompt(scenario: String, question: String, userAnswer: String) -> String {
