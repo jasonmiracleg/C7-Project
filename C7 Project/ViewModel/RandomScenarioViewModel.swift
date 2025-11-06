@@ -1,5 +1,5 @@
 //
-//  GameplayViewModel.swift
+//  RandomScenarioViewModel.swift
 //  C7 Project
 //
 //  Created by Jason Miracle Gunawan on 27/10/25.
@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 @MainActor
-class GameplayViewModel: ObservableObject {
+class RandomScenarioViewModel: ObservableObject {
     
     @Published var storyBank: [String: [StoryDetail]] = [:]
         

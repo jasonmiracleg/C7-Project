@@ -40,7 +40,7 @@ struct ScenarioCard: View {
             .padding(.leading, 16)
         }
         .padding(16)
-        .frame(maxWidth: .infinity, minHeight: 170, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: 165, alignment: .leading)
         .background(Color.backgroundComponent)
         .cornerRadius(12)
     }

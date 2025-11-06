@@ -10,7 +10,7 @@ import SwiftUI
 struct ContextScenarioView: View {
     let scenario: Scenario
     
-    @StateObject private var viewModel = GameplayViewModel()
+    @StateObject private var viewModel = RandomScenarioViewModel()
     
     @State private var selectedStory: StoryDetail?
     
@@ -54,7 +54,6 @@ struct ContextScenarioView: View {
                     .padding(.top, -24)
                 Spacer()
                 
-                // Tombol Mulai
                 Button("START YOUR CONVERSATION") {
                     showGameplaySheet = true
                 }
