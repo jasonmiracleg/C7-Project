@@ -9,114 +9,202 @@ import SwiftUI
 
 struct GameplaySheetView: View {
     @Environment(\.dismiss) var dismiss
-
+    
+    @State private var viewModel: GameplayViewModel
+    
+    let story: StoryDetail
+    
+    init(story: StoryDetail) {
+        self.story = story
+        _viewModel = State(initialValue: GameplayViewModel(story: story))
+    }
+    
     var body: some View {
-        VStack {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack(alignment: VerticalAlignment.center) {
+        NavigationStack {
+            VStack {
+                VStack(alignment: .leading, spacing: 16) {
                     HStack(alignment: VerticalAlignment.center) {
-                        Image(systemName: "clock.fill")
-                            .foregroundStyle(Color(.black.opacity(0.8)))
-                            .font(Font.system(size: 18))
-                        Text("02:40")
-                            .font(.subheadline)
+                        HStack(alignment: VerticalAlignment.center) {
+                            Image(systemName: "clock.fill")
+                                .foregroundStyle(Color(.black.opacity(0.8)))
+                                .font(Font.system(size: 18))
+                            Text("02:40")
+                                .font(.subheadline)
+                        }
+                        Spacer()
+                        Text("Gameplay")
+                            .font(.title2)
+                        Spacer()
+                        Button(action: {
+                            dismiss()
+                        }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 24))
+                                .foregroundStyle(.black)
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(.glass)
                     }
-                    Spacer()
-                    Text("Game Play")
-                        .font(.title2)
+                    
+                    Text(story.mainTopic)
+                        .font(.title3)
                         .fontWeight(.bold)
-                    Spacer()
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Image(systemName: "xmark")
-                            .foregroundStyle(Color(.black))
-                            .font(Font.system(size: 24))
-                            .padding(12)
-                            .background(
-                                Circle()
-                                    .fill(Color.gray.opacity(0.2))
+                }
+                
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 24) {
+                        ForEach(viewModel.chatHistory) { message in
+                            MessageBubble(
+                                text: message.text,
+                                isSent: message.isSent
                             )
+                        }
+                        
+                        if viewModel.isRecording {
+                            HStack {
+                                Spacer()
+                                
+                                RecordingIndicator()
+                                    .padding(.vertical, 10)
+                                    .padding(.horizontal, 14)
+                                    .background(Color.blue)
+                                    .clipShape(.rect(
+                                        topLeadingRadius: 16,
+                                        bottomLeadingRadius: 16,
+                                        bottomTrailingRadius: 0,
+                                        topTrailingRadius: 16
+                                    ))
+                            }
+                            .padding(.horizontal, 10)
+                            .transition(.opacity.combined(with: .scale(scale: 0.8)))
+                        }
                     }
                 }
-                Text("Big Shot")
-                    .font(.title)
-                    .fontWeight(.bold)
-            }
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 24) {
-                    MessageBubble(
-                        text:
-                            "So, can you tell me about what you worked on this past week",
-                        isSent: false
-                    )
-                    MessageBubble(
-                        text:
-                            "I’ve been working on improving the team workflow. We, uh, implement new tools to improve productivity and optimise the team, like, uh, task management system.",
-                        isSent: true
-                    )
-                    MessageBubble(
-                        text:
-                            "That’s great! What kind of tools did you implement to improve the workflow?",
-                        isSent: false
-                    )
-                    MessageBubble(
-                        text:
-                            "We, um, used a new software to track the tasks better. It’s really help the team stay organized, and we can easily meet the deadlines now.",
-                        isSent: true
-                    )
-                    MessageBubble(
-                        text:
-                            "Sounds impressive! How do you think this will help with the company’s efficiency, especially with some people being laid off?",
-                        isSent: false
-                    )
+                .frame(height: 500)
+                Spacer()
+                
+                if viewModel.isFinished {
+                    Text("Good Job!")
+                        .font(.title)
+                        .fontWeight(.bold)
+                    Text("Now, Let's review how you did")
+                        .padding(.bottom, 12)
+                    NavigationLink(destination: EvaluationView()) {
+                        Text("View Evaluation")
+                            .padding(12)
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                Capsule()
+                                    .fill(Color.accentColor.opacity(0.8))
+                            )
+                            .foregroundStyle(.white)
+                    }
+                    .buttonStyle(.plain)
+                    
+                } else {
+                    
+                    if viewModel.isDraftMode {
+                        HStack {
+                            Button(action: {
+                                viewModel.cancelDraft()
+                            }) {
+                                Image(systemName: "xmark")
+                                    .resizable()
+                                    .frame(width: 20, height: 20)
+                                    .foregroundStyle(Color(.black))
+                                    .padding(12)
+                                    .background(
+                                        Circle()
+                                            .fill(Color.gray.opacity(0.2))
+                                    )
+                            }
+                            
+                            ZStack(alignment: .trailing) {
+                                Text(viewModel.transcriptDraft)
+                                    .frame(maxWidth: .infinity, minHeight:30, alignment: .leading)
+                                    .padding(.vertical, 16)
+                                    .padding(.leading, 20)
+                                    .padding (.trailing, 60)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 30, style: .continuous)
+                                            .fill(Color.gray.opacity(0.2))
+                                    )
+                                
+                                Button(action: {
+                                    viewModel.sendMessage()
+                                }) {
+                                    Image(systemName: "paperplane.fill")
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                        .foregroundStyle(Color.white)
+                                        .padding(12)
+                                        .background(
+                                            Circle()
+                                                .fill(Color.interactive)
+                                        )
+                                        .padding(.vertical, 24)
+                                        .padding(.trailing, 16)
+                                }
+                            }
+                        }
+                        Spacer()
+                        
+                    } else if viewModel.isRecording {
+                        Image("Sound Wave")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 40)
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            viewModel.stopRecording()
+                        }) {
+                            Image(systemName: "square.fill")
+                                .foregroundStyle(Color(.white))
+                                .font(Font.system(size: 32))
+                                .padding(18)
+                                .background(
+                                    Circle()
+                                        .fill(Color.interactive)
+                                )
+                        }
+                        
+                    } else {
+                        
+                        let isMicDisabled = !viewModel.permissionsGranted || viewModel.isWaitingForAIResponse
+                        
+                        Button(action: {
+                            viewModel.startRecording()
+                        }) {
+                            Image(systemName: "microphone.fill")
+                                .foregroundStyle(Color(.white))
+                                .font(Font.system(size: 32))
+                                .padding(18)
+                                .background(
+                                    Circle()
+                                        .fill(isMicDisabled ? Color.gray.opacity(0.5) : Color.interactive)
+                                )
+                        }
+                        .disabled(isMicDisabled)
+                    }
                 }
             }
-            .frame(height: 500)
-            Image("Sound Wave")
-            HStack(spacing: 56) {
-                Button(action: {
-
-                }) {
-                    Image(systemName: "arrow.trianglehead.clockwise")
-                        .foregroundStyle(Color(.black))
-                        .font(Font.system(size: 24))
-                        .padding(16)
-                        .background(
-                            Circle()
-                                .fill(Color.gray.opacity(0.15))
-                        )
-                }
-                Button(action: {
-
-                }) {
-                    Image(systemName: "microphone.fill")
-                        .foregroundStyle(Color(.white))
-                        .font(Font.system(size: 32))
-                        .padding(18)
-                        .background(
-                            Circle()
-                                .fill(Color.microphone)
-                        )
-                }
-                Button(action: {
-
-                }) {
-                    Image(systemName: "checkmark")
-                        .foregroundStyle(Color(.black))
-                        .font(Font.system(size: 24))
-                        .padding(16)
-                        .background(
-                            Circle()
-                                .fill(Color.gray.opacity(0.15))
-                        )
-                }
+            .padding(.horizontal, 24)
+            .onAppear {
+                viewModel.onAppear()
             }
-            .frame(maxHeight: .infinity)
         }
     }
 }
 
+// Preview
 #Preview {
-    GameplaySheetView()
+    GameplaySheetView(
+        story: StoryDetail(
+            mainTopic: "Pitching a new project",
+            storyContext: "Ini adalah konteks cerita...",
+            initialPrompt: "Ini adalah pertanyaan pertama untuk preview."
+        )
+    )
 }

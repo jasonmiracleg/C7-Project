@@ -8,23 +8,49 @@
 import SwiftUI
 
 struct EvaluationItemCard: View {
-    let itemNumber: Int
     let promptText: String
     let spokenText: AttributedString
-    @Binding var showingPopup: Bool
-    @Binding var popupCorrection: String
+    
+    @Binding var showingPronunciationPopup: Bool
+    @Binding var pronunciationCorrection: String
+    
+    @Binding var showingGrammarPopup: Bool
+    @Binding var selectedGrammarDetail: GrammarEvaluationDetail?
+    let grammarDetails: [String: GrammarEvaluationDetail]?
+    
+    // Initializer for Pronunciation
+    init(
+         promptText: String,
+         spokenText: AttributedString,
+         showingPronunciationPopup: Binding<Bool>,
+         pronunciationCorrection: Binding<String>) {
+        self.promptText = promptText
+        self.spokenText = spokenText
+        self._showingPronunciationPopup = showingPronunciationPopup
+        self._pronunciationCorrection = pronunciationCorrection
+        self._showingGrammarPopup = .constant(false)
+        self._selectedGrammarDetail = .constant(nil)
+        self.grammarDetails = nil
+    }
+    
+    // Initializer for Grammar
+    init(
+         promptText: String,
+         spokenText: AttributedString,
+         showingGrammarPopup: Binding<Bool>,
+         selectedGrammarDetail: Binding<GrammarEvaluationDetail?>,
+         grammarDetails: [String: GrammarEvaluationDetail]) {
+        self.promptText = promptText
+        self.spokenText = spokenText
+        self._showingPronunciationPopup = .constant(false)
+        self._pronunciationCorrection = .constant("")
+        self._showingGrammarPopup = showingGrammarPopup
+        self._selectedGrammarDetail = selectedGrammarDetail
+        self.grammarDetails = grammarDetails
+    }
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            // Numbered Circle
-            Text("\(itemNumber)")
-                .font(.system(size: 16, weight: .bold))
-                .foregroundColor(.white)
-                .frame(width: 28, height: 28)
-                .background(Circle().fill(Color.red))
-                .padding(.top, 2)
-            
-            // Text Content
             VStack(alignment: .leading, spacing: 8) {
                 Text(promptText)
                     .font(.headline)
@@ -39,9 +65,19 @@ struct EvaluationItemCard: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .environment(\.openURL, OpenURLAction { url in
                         if url.scheme == "popup" {
+                            // Handle Pronunciation
                             let correction = String(url.host ?? "error")
-                            popupCorrection = correction
-                            showingPopup = true
+                            pronunciationCorrection = correction
+                            showingPronunciationPopup = true
+                            return .handled
+                        } else if url.scheme == "grammar" {
+                            // Handle Grammar
+                            let key = String(url.host ?? "")
+                            // Look up the detail object from the map
+                            if let detail = grammarDetails?[key] {
+                                selectedGrammarDetail = detail
+                                showingGrammarPopup = true
+                            }
                             return .handled
                         }
                         return .discarded
@@ -49,9 +85,8 @@ struct EvaluationItemCard: View {
             }
         }
         .padding()
-        .background(Color(UIColor.systemBackground))
+        .background(Color(UIColor.systemGray6))
         .cornerRadius(12)
     }
 }
-
 

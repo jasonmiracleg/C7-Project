@@ -10,62 +10,42 @@ import SwiftUI
 
 struct PronunciationEvaluationView: View {
     
-    @State private var showingPopup = false
-    @State private var popupCorrection = ""
+    @Binding var showingPronunciationPopup: Bool
+    @Binding var pronunciationCorrection: String
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
                 EvaluationHeaderCard(
                     title: "Incorrect Pronunciation",
-                    subtitle: "20/130 words"
+                    subtitle: "20/130 words",
+                    color: Color.blue
                 )
                 
                 EvaluationItemCard(
-                    itemNumber: 1,
                     promptText: "Pitch your skills to the HR before the elevator reaches the ground floor!",
                     spokenText: evaluationText1(),
-                    showingPopup: $showingPopup,
-                    popupCorrection: $popupCorrection
+                    showingPronunciationPopup: $showingPronunciationPopup,
+                    pronunciationCorrection: $pronunciationCorrection
                 )
                 
                 EvaluationItemCard(
-                    itemNumber: 2,
                     promptText: "That's impressive! What kind of business did you start when you were younger?",
                     spokenText: evaluationText2(),
-                    showingPopup: $showingPopup,
-                    popupCorrection: $popupCorrection
+                    showingPronunciationPopup: $showingPronunciationPopup,
+                    pronunciationCorrection: $pronunciationCorrection
                 )
                 
                  EvaluationItemCard(
-                     itemNumber: 3,
                      promptText: "Sounds like you've got a real passion for entrepreneurship. What motivates you to keep building businesses?",
                      spokenText: evaluationText3(),
-                     showingPopup: $showingPopup,
-                     popupCorrection: $popupCorrection
+                     showingPronunciationPopup: $showingPronunciationPopup,
+                     pronunciationCorrection: $pronunciationCorrection
                  )
 
             }
             .padding(.horizontal)
         }
-        .overlay(
-            Group {
-                if showingPopup {
-                    Color.black.opacity(0.4)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            showingPopup = false
-                        }
-                    
-                    PronunciationPopup(
-                        correctionText: popupCorrection,
-                        isPresented: $showingPopup
-                    )
-                    .transition(.scale.combined(with: .opacity))
-                }
-            }
-            .animation(.easeInOut, value: showingPopup)
-        )
     }
 
     private func evaluationText1() -> AttributedString {
@@ -77,7 +57,7 @@ struct PronunciationEvaluationView: View {
         entrepreneur.underlineColor = .red
         entrepreneur.link = URL(string: "popup://en-tre-pre-neur")
         
-        var rest = AttributedString(", from an early age I've always been eager to run a business.")
+        let rest = AttributedString(", from an early age I've always been eager to run a business.")
         
         text.append(entrepreneur)
         text.append(rest)
@@ -93,7 +73,7 @@ struct PronunciationEvaluationView: View {
         custom.underlineColor = .red
         custom.link = URL(string: "popup://cus-tom")
         
-        var part2 = AttributedString(" phone case. It's not big, but I learning how to manage, like, money and customer talk ")
+        let part2 = AttributedString(" phone case. It's not big, but I learning how to manage, like, money and customer talk ")
         
         var properly = AttributedString("properly")
         properly.foregroundColor = .red
@@ -101,7 +81,7 @@ struct PronunciationEvaluationView: View {
         properly.underlineColor = .red
         properly.link = URL(string: "popup://prop-er-ly")
         
-        var part3 = AttributedString(".")
+        let part3 = AttributedString(".")
         
         part1.append(custom)
         part1.append(part2)
@@ -119,7 +99,7 @@ struct PronunciationEvaluationView: View {
         excited.underlineColor = .red
         excited.link = URL(string: "popup://ex-cit-ed")
         
-        var part2 = AttributedString(" to try again and make it more better next time.")
+        let part2 = AttributedString(" to try again and make it more better next time.")
         
         part1.append(excited)
         part1.append(part2)
@@ -127,6 +107,3 @@ struct PronunciationEvaluationView: View {
     }
 }
 
-#Preview {
-    PronunciationEvaluationView()
-}

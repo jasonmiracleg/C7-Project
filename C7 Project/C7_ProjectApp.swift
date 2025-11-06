@@ -25,7 +25,7 @@ struct C7_ProjectApp: App {
 
     var body: some Scene {
         WindowGroup {
-            GrammarTestView()
+            ScenariosView()
         }
         .modelContainer(sharedModelContainer)
     }

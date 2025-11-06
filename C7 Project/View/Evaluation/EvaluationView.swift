@@ -16,8 +16,15 @@ enum tabSegments: String, CaseIterable{
 struct EvaluationView: View {
     @State private var selectedSegment: tabSegments = .pronunciation
     
+    @State private var showingPronunciationPopup = false
+    @State private var pronunciationCorrection = ""
+    
+    
+    @State private var showingGrammarPopup = false
+    @State private var selectedGrammarDetail: GrammarEvaluationDetail? = nil
+    
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             Picker("Evaluation Tab", selection: $selectedSegment){
                 ForEach(tabSegments.allCases, id: \.self){
                     Text($0.rawValue)
@@ -25,25 +32,51 @@ struct EvaluationView: View {
             }
             .pickerStyle(.segmented)
             .padding(.horizontal)
+            .padding(.bottom, 10)
             
-            chosenTabView(selectedTab: selectedSegment)
+            chosenTabView(
+                selectedTab: selectedSegment,
+                showingPronunciationPopup: $showingPronunciationPopup,
+                pronunciationCorrection: $pronunciationCorrection,
+                showingGrammarPopup: $showingGrammarPopup,
+                selectedGrammarDetail: $selectedGrammarDetail
+            )
+            
             Spacer()
             
         }
         .navigationTitle("Evaluation")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $selectedGrammarDetail) { detail in
+            DetailEvaluationModal(detail: detail)
+        }
+        .sheet(isPresented: $showingPronunciationPopup) {
+            PronunciationPopup(
+                correctionText: $pronunciationCorrection,
+                isPresented: $showingPronunciationPopup
+            )
+            .presentationDetents([.medium])
+        }
     }
 }
 
 struct chosenTabView: View {
     var selectedTab: tabSegments
     
+    @Binding var showingPronunciationPopup: Bool
+    @Binding var pronunciationCorrection: String
+    @Binding var showingGrammarPopup: Bool
+    @Binding var selectedGrammarDetail: GrammarEvaluationDetail?
+    
     var body: some View {
         switch selectedTab {
             case .pronunciation:
-                PronunciationEvaluationView()
+                PronunciationEvaluationView(showingPronunciationPopup: $showingPronunciationPopup, pronunciationCorrection: $pronunciationCorrection)
             case .grammar:
-                GrammarEvaluationView()
+                GrammarEvaluationView(
+                    showingPopup: $showingGrammarPopup,
+                    selectedGrammarDetail: $selectedGrammarDetail
+                )
             case .interpretation:
                 InterpretationEvaluationView()
         }
