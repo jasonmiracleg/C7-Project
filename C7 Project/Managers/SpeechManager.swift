@@ -13,6 +13,7 @@ import Speech
 class SpeechManager {
     
     var isRecording: Bool = false
+    var transcript: String = ""
     
     // Speech Object
     private let audioEngine = AVAudioEngine()
@@ -55,10 +56,13 @@ class SpeechManager {
     // MARK: - Recording Lifecycle
     func startRecording() throws {
         
+        stopRecording()
         
         guard let recognizer = speechRecognizer, recognizer.isAvailable else {
             throw NSError(domain: "SpeechRecognizer", code: -1, userInfo: [NSLocalizedDescriptionKey: "Speech Recognizer not Available"])
         }
+        
+        transcript = ""
         
         // Configure Audio Session
         let audioSession = AVAudioSession.sharedInstance()
@@ -88,7 +92,7 @@ class SpeechManager {
             
             if let result = result {
                 DispatchQueue.main.async {
-//                    self.transcript = result.bestTranscription.formattedString
+                    self.transcript = result.bestTranscription.formattedString
                 }
             }
             
@@ -98,7 +102,6 @@ class SpeechManager {
             }
             
             if result?.isFinal == true {
-                
             }
         }
     }
@@ -113,8 +116,6 @@ class SpeechManager {
         
         recognitionRequest?.endAudio()
         recognitionRequest = nil
-        
-        recognitionTask?.cancel()
         recognitionTask = nil
         
         isRecording = false

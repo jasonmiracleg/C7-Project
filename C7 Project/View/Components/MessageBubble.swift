@@ -15,7 +15,7 @@ struct MessageBubble: View {
         HStack {
             if isSent { Spacer() }
             Text(text)
-                .frame(width: 250)
+                .frame(width: 250, alignment: .leading)
                 .padding(.vertical, 10)
                 .padding(.horizontal, 14)
                 .background(
