@@ -8,9 +8,13 @@
 import Foundation
 
 // MARK: - Local Model
-struct InterpretationItem: Identifiable {
+struct InterpretationItem: Identifiable, Equatable {
     let id = UUID()
     let promptText: String
     let spokenText: String
     var interpretedText: InterpretedText? = nil
+    
+    mutating func addInterpretation(_ interpretation: InterpretedText){
+        interpretedText = interpretation
+    }
 }

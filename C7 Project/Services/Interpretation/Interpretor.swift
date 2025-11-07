@@ -12,12 +12,12 @@ import Playgrounds
 
 
 @Generable
-struct InterpretedText {
+struct InterpretedText: Equatable {
     @Guide(description:"The original unedited version of the text")
     let original: String
     
     @Guide(description:"A one line summary of the text")
-     let summary: String
+    let summary: String
     
     @Guide(description:"A list of what you've interpreted from the user")
     let points: [String]
