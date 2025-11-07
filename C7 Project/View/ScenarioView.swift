@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-struct ScenariosView: View {
+struct ScenarioView: View {
     @State private var selectedScenario: Scenario?
     
 
@@ -44,5 +44,5 @@ struct ScenariosView: View {
 }
 
 #Preview {
-    ScenariosView()
+    ScenarioView()
 }
