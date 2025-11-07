@@ -19,7 +19,6 @@ struct APIKeyManager {
              fatalError("Please update API_KEY in Keys.xcconfig with your actual API key.")
         }
         
-        print(key)
         return key
     }
 }

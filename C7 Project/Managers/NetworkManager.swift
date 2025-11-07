@@ -38,7 +38,7 @@ class NetworkManager {
     /// Checks the health of the API server.
     /// Returns `true` if the server returns HTTP 200, otherwise throws an error.
     func checkHealth() async throws -> Bool {
-        let request = try APIRouter.healthCheck.asURLRequest()
+        let request = try APIRouter.grammarModelHealth.asURLRequest()
         
         let (_, response) = try await session.data(for: request)
         
