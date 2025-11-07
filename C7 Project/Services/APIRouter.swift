@@ -63,9 +63,6 @@ enum APIRouter {
         
         // --- Add Headers ---
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        // --- FIX: Match the API documentation's Authorization header ---
-        // The curl example uses: -H "Authorization: Api-Key <YOUR_API_KEY>"
         request.setValue("Api-Key \(APIKeyManager.apiKey)", forHTTPHeaderField: "Authorization")
 
         
@@ -75,8 +72,8 @@ enum APIRouter {
             let body = FlagRequest(original_text: original, corrected_text: corrected)
             let data = try JSONEncoder().encode(body)
             request.httpBody = data
+        // TODO: Add request body for scorePronunciation request
         default:
-            // No body for .healthCheck
             break
         }
         
