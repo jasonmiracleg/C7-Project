@@ -21,3 +21,4 @@ Carthage/Build/
 *.swp
 *.bak
 /C7 Project/Config/Keys.xcconfig
+C7 Project/Config/Keys.xcconfig

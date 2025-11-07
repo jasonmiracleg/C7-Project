@@ -16,27 +16,38 @@ struct FlagRequest: Codable {
 enum APIRouter {
     // Base URL TODO: Change to actual REST API URL later
     private var baseURL: String {
-        return "http://127.0.0.1:8000/api"
+        return "https://c7m1-rest-api.my.id"
     }
     
-    case healthCheck
+    case grammarModelHealth
     case flagErrors(original: String, corrected: String)
+    case pronunciationModelHealth
+    case scorePronunciation(targetText: String, audioFile: FileWrapper) // Replace with actual file type
 
     private var path: String {
         switch self {
-        case .healthCheck:
-            return "/health"
+        case .grammarModelHealth:
+            return "/grammar/health"
         case .flagErrors:
-            return "/flag/"
+            return "/grammar/flag/"
+            
+        case .pronunciationModelHealth:
+            return "/pronunciation/health"
+        case .scorePronunciation:
+            return "/pronunciation/score/"
         }
     }
     
     // Returns the HTTP method
     private var method: String {
         switch self {
-        case .healthCheck:
+        case .grammarModelHealth:
             return "GET"
         case .flagErrors:
+            return "POST"
+        case .pronunciationModelHealth:
+            return "GET"
+        case .scorePronunciation(targetText: let targetText, audioFile: let audioFile):
             return "POST"
         }
     }
