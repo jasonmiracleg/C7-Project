@@ -38,7 +38,8 @@ class InterpretationEvaluationViewModel: ObservableObject {
         )
     ]
     
-    @Published var currentTaskDescription: String? = nil // this is for debugging purposes
+    @Published var currentTaskDescription: String? = nil // this is for debugging purposes, shows what the viewModel is doing rn
+    @Published var debugging = false
     
     // initialize with the prompt text and spoken text
     init(items: [InterpretationItem] = []){
@@ -55,21 +56,25 @@ class InterpretationEvaluationViewModel: ObservableObject {
         guard !items.isEmpty else { return }
         isLoading = true
         defer { isLoading = false }
-
+        
         currentTaskDescription = "Model is interpretating..."
+        
         let updated = await generateInterpretedPoints(items: items)
         items = updated
-        currentTaskDescription = "items have been updated"
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
         
-        if items == updated {
-            currentTaskDescription = "Successfully interpreted"
+        if debugging {
+            currentTaskDescription = "items have been updated"
             try? await Task.sleep(nanoseconds: 1_000_000_000)
+        
+            if items == updated {
+                currentTaskDescription = "Successfully interpreted"
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
 
-        } else {
-            currentTaskDescription = "items didnt change..."
-            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            } else {
+                currentTaskDescription = "items didnt change..."
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
 
+            }
         }
         
         currentTaskDescription = nil
@@ -95,9 +100,16 @@ class InterpretationEvaluationViewModel: ObservableObject {
                 }
             }
         }
-
-        currentTaskDescription = "Completed interpretations, now returning temp array"
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
+        
+        if debugging{
+            currentTaskDescription = "Completed interpretations, now returning temp array"
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+        }
+        
         return tempItems
+    }
+    
+    func viewDebug() {
+        debugging = true
     }
 }
