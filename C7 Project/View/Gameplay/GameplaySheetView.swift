@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FoundationModels
 
 struct GameplaySheetView: View {
     @Environment(\.dismiss) var dismiss

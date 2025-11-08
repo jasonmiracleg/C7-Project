@@ -17,7 +17,9 @@ class GameplayViewModel {
     var isWaitingForAIResponse: Bool = false
     var permissionsGranted: Bool = false
     
+    private let story: StoryDetail
     private var speechManager = SpeechManager()
+    private let followUpGenerator = FollowUpQuestion()
     
     var isRecording: Bool {
         speechManager.isRecording
@@ -27,7 +29,22 @@ class GameplayViewModel {
         !transcriptDraft.isEmpty && !isRecording
     }
     
-    private let story: StoryDetail
+    var lastAIQuestion: String? {
+        // Second to last from chatHistory
+        guard chatHistory.count >= 2 else { return nil}
+        
+        let AImessage = chatHistory[chatHistory.count - 2]
+        
+        // isSent must be false
+        return !AImessage.isSent ? AImessage.text : nil
+    }
+    
+    var lastUserAnswer: String? {
+        // Last message from chatHistory
+        guard let lastMessage = chatHistory.last else { return nil }
+        
+        return lastMessage.isSent ? lastMessage.text : nil
+    }
     
     init(story: StoryDetail) {
         self.story = story
@@ -69,9 +86,11 @@ class GameplayViewModel {
         cancelDraft()
         
         isWaitingForAIResponse = true
-        print("--- AI PROSES NEXT FOLLOW UP QUESTION (Mic Disabled) ---")
         
-        getDummyAIResponse()
+        Task {
+            print("--- AI PROSES NEXT FOLLOW UP QUESTION (Mic Disabled) ---")
+            await generateFollowUpQuestion()
+        }
     }
     
     private func requestPermissions() {
@@ -102,4 +121,44 @@ class GameplayViewModel {
             self.isWaitingForAIResponse = false
         }
     }
+    
+    @MainActor
+    private func generateFollowUpQuestion() async {
+        print("DEBUG CHAT HISTORY:")
+        for (index, msg) in chatHistory.enumerated() {
+            print("[\(index)] \(msg.text) | isSent: \(msg.isSent)")
+        }
+
+        print("DEBUG lastAIQuestion:", lastAIQuestion ?? "nil")
+        print("DEBUG lastUserAnswer:", lastUserAnswer ?? "nil")
+
+        
+        guard let previousAI = lastAIQuestion,
+              let lastUserAnswer = lastUserAnswer else {
+            isWaitingForAIResponse = false
+            return
+        }
+        
+        // Optional delay if you want to simulate AI thinking
+        try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 sec
+        
+        do {
+            let followUp = try await followUpGenerator.generateFollowUpQuestion(
+                scenario: story.storyContext,   // ✅ scenario context stays here
+                question: previousAI,
+                userAnswer: lastUserAnswer
+            )
+            
+            chatHistory.append(ChatMessage(text: followUp, isSent: false))
+            
+            if chatHistory.count > 6 {
+                isFinished = true
+            }
+        } catch {
+            print("[Follow-Up Generation Error]: \(error)")
+        }
+        
+        isWaitingForAIResponse = false
+    }
+
 }
