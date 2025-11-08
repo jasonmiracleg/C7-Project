@@ -21,7 +21,10 @@ actor FollowUpQuestion {
     
     init() {
         // Initialize the model and session
+        
         let model = SystemLanguageModel()
+        
+        print(model.availability)
         
         self.session = LanguageModelSession(model:model, instructions: followUpQuestionModelInstructions)
     }
