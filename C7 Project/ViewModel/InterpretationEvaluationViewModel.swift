@@ -38,7 +38,8 @@ class InterpretationEvaluationViewModel: ObservableObject {
         )
     ]
     
-    @Published var currentTaskDescription: String? = nil // this is for debugging purposes
+    @Published var currentTaskDescription: String? = nil // this is for debugging purposes, shows what the viewModel is doing rn
+    @Published var debugging = false
     
     // initialize with the prompt text and spoken text
     init(items: [InterpretationItem] = []){
@@ -55,49 +56,41 @@ class InterpretationEvaluationViewModel: ObservableObject {
         guard !items.isEmpty else { return }
         isLoading = true
         defer { isLoading = false }
-
-        currentTaskDescription = "Model is interpretating..."
-        let updated = await generateInterpretedPoints(items: items)
-        items = updated
-        currentTaskDescription = "items have been updated"
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
         
-        if items == updated {
-            currentTaskDescription = "Successfully interpreted"
+        currentTaskDescription = "Model is interpretating..."
+        
+        await generateInterpretedPoints()
+        
+        if debugging {
+            currentTaskDescription = "items have been updated"
             try? await Task.sleep(nanoseconds: 1_000_000_000)
-
-        } else {
-            currentTaskDescription = "items didnt change..."
-            try? await Task.sleep(nanoseconds: 1_000_000_000)
-
         }
         
         currentTaskDescription = nil
     }
     
     //    i expect it initially has InterpretedText as nil so this generates the points from spokenText
-    private func generateInterpretedPoints(items: [InterpretationItem]) async -> [InterpretationItem] {
-        
-        // idk if it makes a copy ill play it safe
+    //  live updates
+    private func generateInterpretedPoints() async {
         let interpretor = Interpretor()
-        var tempItems = items
             
         // need to use indices instead of iterating through items
         // because it needs to access array, otherwise itll only provide a copy
-        for i in tempItems.indices {
-            if tempItems[i].interpretedText == nil {
-                currentTaskDescription = "Interpreting text \(i + 1): \(tempItems[i].spokenText)"
+        for i in items.indices {
+            if items[i].interpretedText == nil {
+                currentTaskDescription = "Interpreting text \(i + 1): \(items[i].spokenText)"
                 do {
-                    let result = try await interpretor.interpret(tempItems[i].spokenText)
-                    tempItems[i].addInterpretation(result)
+                    let result = try await interpretor.interpret(items[i].spokenText)
+                    items[i].addInterpretation(result)
                 } catch {
-                    print("❌ Failed to interpret \(tempItems[i].spokenText): \(error)")
+                    print("❌ Failed to interpret \(items[i].spokenText): \(error)")
                 }
             }
         }
-
-        currentTaskDescription = "Completed interpretations, now returning temp array"
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
-        return tempItems
+        
+    }
+    
+    func viewDebug() {
+        debugging = true
     }
 }
