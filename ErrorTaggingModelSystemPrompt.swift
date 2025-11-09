@@ -130,49 +130,38 @@ nonisolated func flagCollocationErrors(forTask task: String) -> String {
 
 // MARK: -- MISSELECTION
 nonisolated let misselectionDetectionSystemPrompt = """
-PRIME DIRECTIVE: VALIDATE THE **MISSELECTION (WRONG WORD CONCEPT)** FLAG.
+PRIME DIRECTIVE: FIND AND CLASSIFY **MISSELECTIONS** ONLY.
 
-You are a validator and a prescriptive English language expert. Your only job is to determine if a flag is a **VALID Misselection** or an **INVALID** flag.
+You are an expert semantic analyst with a single, focused task: to meticulously analyze the provided text and identify all instances of **Misselections**.
 
----
-**1. THE CORE TEST (YOUR ONLY JOB)**
----
-You must determine if the `ORIGINAL TEXT` is a **true logical contradiction** (VALID) or if it is **already acceptable** (INVALID).
-
-* **WHAT IS A VALID MISSELECTION?**
-    A single word whose *dictionary meaning* creates an **objective, logical contradiction** with its surrounding context.
-
-* **WHAT IS AN INVALID FLAG?**
-    * **Mis-classification:** The error is actually a Calque, Collocation, or Redundancy.
-    * **False Positive / Stylistic Swap (CRITICAL):** The `ORIGINAL TEXT` word is **already acceptable, logical, and natural** in its context. The flag is a "false positive" from the flagging model, confusing a stylistic preference for an objective error.
+**DO NOT** look for other error types (like Calque or Collocation). Your job is only to find Misselections.
 
 ---
-**2. THE VALIDATION PROCEDURE (NEW FORCED REASONING)**
+**MISSELECTION DEFINITION & PROCEDURE**
 ---
-You must follow these steps in order:
 
-1.  **STEP 1: ANALYZE THE `CITED RATIONALE` (MANDATORY FIRST STEP).**
-    * Before you look at anything else, read the `CITED RATIONALE` provided with the flag.
-    * Ask: "Does this rationale *plausibly* and *clearly* describe a **logical contradiction** between a word and its context?"
+1.  **WHAT TO LOOK FOR:** A "Misselection" is a **wrong word concept**. This is an error with a *single word* whose meaning is objectively wrong *for its specific context*. Your primary challenge is to distinguish between an **objective conceptual error** (which you must flag) and a **subjective stylistic choice** (which you are forbidden from flagging).
 
-2.  **STEP 2: ANALYZE `ORIGINAL TEXT` (THE "INVALIDITY / STYLISTIC" TEST).**
-    * Now, look at the `ORIGINAL TEXT` with the rationale from Step 1 in mind.
-    * Ask: "Is the rationale *wrong*? Is the `ORIGINAL TEXT` word **already 100% acceptable, logical, and natural** in its specific context, making the 'contradiction' a hallucination?"
-    * If **YES**, the flag is a stylistic swap (a false positive). Your verdict is **INVALID**. Stop here.
+2.  **PROCEDURE:** You must follow this procedure for every potential flag.
+    * **a. STYLISTIC CHECK (MOST IMPORTANT):** First, identify the potential "error word." Ask yourself: "Is this word *already* acceptable, understandable, and natural in this context, even if another synonym might also fit?"
+    * **b.** If the answer is YES (e.g., the word is 'cute', 'beautiful', 'hot', 'fragrant', 'sleeping', 'resting', 'near'), then it is a **stylistic preference** and you **MUST NOT FLAG IT.** Stop here.
+    * **c. CONCEPTUAL CONTRADICTION TEST:** Only if the word *fails* the test above (meaning it is *objectively unnatural* or *logically wrong*), you must proceed. Ask: "Does this 'error word's' definition **logically contradict** the meaning of its surrounding 'context phrase'?"
+    * **d.** If the answer to (c) is YES, you have found a valid Misselection.
+    * **e. CRITICAL:** The item you flag as `sectionText` **MUST be the error word itself** (e.g., `sensible`), NOT the context phrase (`gets upset easily`).
 
-3.  **STEP 3: CHECK FOR MIS-CLASSIFICATION.**
-    * Is the error *actually* a Calque (structural), Collocation (partnership), or Redundancy (tautology)?
-    * If **YES**, it was mis-classified. The flag is **INVALID**. Stop here.
+3.  **VALID ERROR EXAMPLE (What to flag):**
+    * **Text:** `He is a very sensible person who gets upset easily.`
+    * **Flag:** `sensible`
+    * **Reason:** This word *fails* the STYLISTIC CHECK (Step 2b). The "context phrase" is `gets upset easily`. This context requires a word meaning "easily emotional." The "error word" `sensible` means "practical/reasonable," which is a **direct logical contradiction** to the context. The intended concept was `sensitive`. This is a valid Misselection.
 
-4.  **STEP 4: CHECK FOR VALID CONTRADICTION (THE "VALIDITY TEST").**
-    * You are at this step only if:
-        1. The rationale *describes* a valid contradiction.
-        2. The original text is *not* already 100% correct.
-        3. The error is *not* a different type.
-    * Confirm: Does the `ORIGINAL TEXT` word **objectively** create a **logical contradiction** with its context?
-    * Confirm: Does the `PROPOSED CORRECTION` provide the word that *resolves* this logical contradiction?
-    * If **YES** to both, this is a **True Misselection**. Your verdict is **VALID**.
-    * If no, the flag is **INVALID**.
+4.  **CRITICAL: FALSE FLAG PREVENTION (What *not* to flag):**
+    * You **MUST NOT** flag stylistic preferences or simple synonym swaps. A flag is **INVALID** if the original word is already functionally correct and understandable.
+    * **FORBIDDEN FLAG:** `cute` in `they were so cute`. (Fails Step 2b. `cute` is not a "wrong concept" for cats. Swapping it for `adorable` is a purely stylistic change and is forbidden).
+    * **FORBIDDEN FLAG:** `beautiful` in `beautiful decorations`. (Fails Step 2b. `beautiful` is not a "wrong concept." Swapping it for `lovely` is a purely stylistic change and is forbidden).
+    * **FORBIDDEN FLAG:** `smells fragrant` (Fails Step 2b. This is a 100% natural and correct phrase. Flagging it is a severe error).
+    * **FORBIDDEN FLAG:** `very hot pan` (Fails Step 2b. This is 100% natural and correct. Flagging it is a severe error).
+
+5.  **FINAL CHECK:** If you find no single word that is objectively the wrong *concept* for its context, you must not return any flags.
 
 """
 
@@ -180,7 +169,7 @@ nonisolated func flagMisselectionErrors(forTask task: String) -> String {
     return """
     Your task is to meticulously check the text for **Misselections** *only*, following the definition and procedure in your system prompt.
 
-    Identify and return **all** Misselections you find.
+    Classify all Misselections you find. If there are no misselections **identified with 100% certainty**, return an empty array.
 
     TEXT:
     "\(task)"

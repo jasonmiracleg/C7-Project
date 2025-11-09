@@ -102,49 +102,26 @@ nonisolated func validationModelSystemPrompt(errorType: SemanticErrorType) -> St
         """
     case .Misselection:
         return """
-        PRIME DIRECTIVE: VALIDATE THE **MISSELECTION (WRONG WORD CONCEPT)** FLAG.
+        PRIME DIRECTIVE: VALIDATE THE **MISSELECTION** FLAG.
 
-        You are a validator and a prescriptive English language expert. Your only job is to determine if a flag is a **VALID Misselection** or an **INVALID** flag.
-
-        ---
-        **1. THE CORE TEST (YOUR ONLY JOB)**
-        ---
-        You must determine if the `ORIGINAL TEXT` is a **true logical contradiction** (VALID) or if it is **already acceptable** (INVALID).
-
-        * **WHAT IS A VALID MISSELECTION?**
-            A single word whose *dictionary meaning* creates an **objective, logical contradiction** with its surrounding context.
-
-        * **WHAT IS AN INVALID FLAG?**
-            * **Mis-classification:** The error is actually a Calque, Collocation, or Redundancy.
-            * **False Positive / Stylistic Swap (CRITICAL):** The `ORIGINAL TEXT` word is **already acceptable, logical, and natural** in its context. The flag is a "false positive" from the flagging model, confusing a stylistic preference for an objective error.
+        You are a validator. Your only job is to determine if a flag is a **VALID Misselection** or an **INVALID** flag.
 
         ---
-        **2. THE VALIDATION PROCEDURE (NEW FORCED REASONING)**
+        **THE CORE TEST**
         ---
-        You must follow these steps in order:
 
-        1.  **STEP 1: ANALYZE THE `CITED RATIONALE` (MANDATORY FIRST STEP).**
-            * Before you look at anything else, read the `CITED RATIONALE` provided with the flag.
-            * Ask: "Does this rationale *plausibly* and *clearly* describe a **logical contradiction** between a word and its context?"
+        You must determine if the `ORIGINAL TEXT` word is *already* correct, or if it is a *true Misselection*.
 
-        2.  **STEP 2: ANALYZE `ORIGINAL TEXT` (THE "INVALIDITY / STYLISTIC" TEST).**
-            * Now, look at the `ORIGINAL TEXT` with the rationale from Step 1 in mind.
-            * Ask: "Is the rationale *wrong*? Is the `ORIGINAL TEXT` word **already 100% acceptable, logical, and natural** in its specific context, making the 'contradiction' a hallucination?"
-            * If **YES**, the flag is a stylistic swap (a false positive). Your verdict is **INVALID**. Stop here.
+        1.  **TEST FOR INVALIDITY (Stylistic Swaps):**
+            First, check if the `ORIGINAL TEXT` word is *already* acceptable, logical, and natural *in its specific context*.
+            * If the original word is already perfectly fine and logical, the flag is **INVALID**. This includes simple synonym swaps (where both words are correct and share a similar meaning) and minor modifier tweaks.
 
-        3.  **STEP 3: CHECK FOR MIS-CLASSIFICATION.**
-            * Is the error *actually* a Calque (structural), Collocation (partnership), or Redundancy (tautology)?
-            * If **YES**, it was mis-classified. The flag is **INVALID**. Stop here.
+        2.  **TEST FOR VALIDITY (True Misselection):**
+            If the original text is *not* acceptable, you must check if it is a **True Misselection**.
+            * A **Valid Misselection** is a word whose *core meaning* creates a **logical contradiction** with its surrounding context. The word is demonstrably the *wrong semantic concept* (e.g., a word meaning "practical" when the context *demands* a word meaning "emotional").
+            * If the flag meets this test, it is **VALID**.
 
-        4.  **STEP 4: CHECK FOR VALID CONTRADICTION (THE "VALIDITY TEST").**
-            * You are at this step only if:
-                1. The rationale *describes* a valid contradiction.
-                2. The original text is *not* already 100% correct.
-                3. The error is *not* a different type.
-            * Confirm: Does the `ORIGINAL TEXT` word **objectively** create a **logical contradiction** with its context?
-            * Confirm: Does the `PROPOSED CORRECTION` provide the word that *resolves* this logical contradiction?
-            * If **YES** to both, this is a **True Misselection**. Your verdict is **VALID**.
-            * If no, the flag is **INVALID**.
+        **Your entire job is to apply this logic.**
 
         """
     }
@@ -200,9 +177,9 @@ nonisolated func validateFlagPrompt(flag: ErrorFlag) -> String {
         """
     case .Misselection:
         return """
-        Your task is to validate the following flag, which was cited as a **MISSELECTION (WRONG WORD CONCEPT)**.
+        Your task is to validate the following flag, which was cited as a **MISSELECTION**.
 
-        Use your system prompt's 4-step procedure (starting with the `CITED RATIONALE`) to determine if this is a **VALID** Misselection or an **INVALID** flag.
+        Use your system prompt to determine if this is a **VALID** Misselection (a true logical contradiction) or an **INVALID** flag (a stylistic synonym swap).
 
         ---
         **FLAG TO VALIDATE**

@@ -46,7 +46,7 @@ struct ErrorFlag: CustomStringConvertible, Sendable, Hashable {
     @Guide(description: "A short, technical explanation for why the section is an objective error and why the correction is necessary.")
     let errorRationale: String
     
-    @Guide(description: "Provide the corrected version of the flagged sentence.")
+    @Guide(description: "Provide the corrected version of the flagged sentence. It should first be **exactly the same as section text**; With the only difference being the **corrected part** of the sentence.")
     let correctedSectionText: String
     
     var description: String {

@@ -20,7 +20,7 @@ class GrammarTestViewModel {
     My new colleague's name is Budi. He is a smart man and also very friendly. He always helps me when I have problems with my computer. He speaks English very well, so we can communicate easily. I think he is a nice person and easy to work with. Everybody in the office likes him because he always smiles.
     """
     var correctedText: String = ""
-    var validatedFlags: [ErrorFlag] = [] // NEW: To store semantic flags
+    var validatedFlags: [ErrorFlag] = []
     var isCheckingGrammar: Bool = false
     private let grammarAnalyst: GrammarAnalyst
     
