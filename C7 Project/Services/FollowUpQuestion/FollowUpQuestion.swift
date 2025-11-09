@@ -12,14 +12,8 @@ import Playgrounds
 
 @Generable()
 struct FollowUpQuestionText {
-    @Guide(description: "The scenario context")
-    let scenario: String
-    
-    @Guide(description: "The question that has been answered")
-    let question: String
-    
-    @Guide(description: "The user's answer")
-    let userAnswer: String
+    @Guide(description: "The generated follow-up question")
+    let followUpQuestion: String
 }
 
 actor FollowUpQuestion {
@@ -27,14 +21,17 @@ actor FollowUpQuestion {
     
     init() {
         // Initialize the model and session
+        
         let model = SystemLanguageModel()
+        
+        print(model.availability)
         
         self.session = LanguageModelSession(model:model, instructions: followUpQuestionModelInstructions)
     }
     
-    func generateFollowUpQuestion(scenario: String, question: String, userAnswer: String) async throws -> FollowUpQuestionText {
+    func generateFollowUpQuestion(scenario: String, question: String, userAnswer: String) async throws -> String {
         let prompt = followUpQuestionSystemPrompt(scenario: scenario, question: question, userAnswer: userAnswer)
         let response = try await session.respond(to: prompt, generating: FollowUpQuestionText.self)
-        return response.content
+        return response.content.followUpQuestion
     }
 }
