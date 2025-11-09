@@ -46,10 +46,6 @@ struct GameplaySheetView: View {
                         }
                         .buttonStyle(.glass)
                     }
-                    
-                    Text(story.mainTopic)
-                        .font(.title3)
-                        .fontWeight(.bold)
                 }
                 
                 ScrollView(showsIndicators: false) {
@@ -81,6 +77,7 @@ struct GameplaySheetView: View {
                         }
                     }
                 }
+                .padding(.top, 12)
                 .frame(height: 500)
                 Spacer()
                 
