@@ -104,11 +104,15 @@ extension GrammarAnalyst {
         )
         
         print("""
+        
+        
         Error Flag:
         \(flag)
         ----------
         Validation Verict:
         \(response.content)
+        
+        
         """)
         
         return response.content.isValid
