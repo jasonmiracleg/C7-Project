@@ -127,7 +127,7 @@ actor GrammarAnalyst {
     // MARK: - Stage 1: Syntactic (Grammar) Check
     
     /// Runs the initial grammar correction on the text.
-    private func runSyntacticCheck(on text: String) async throws -> String {
+    func runSyntacticCheck(on text: String) async throws -> String {
         print("--- Analyst Stage 1: Running Grammar Check ---")
         
         // STABILITY CHECK: Wait for the session to be ready
