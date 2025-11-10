@@ -55,13 +55,14 @@ struct ContextScenarioView: View {
                             Triangle()
                                 .fill(Color.gray.opacity(0.2))
                                 .frame(width:30, height: 20)
-                                .offset(x: -40, y: 20)
+                                .offset(x: 50, y: 20)
                         }
                     
                     Image("Context")
                         .resizable()
                         .frame(width: 350, height: 350)
-                        .padding(.top, -24)
+//                        .background(.red)
+                        .padding(.top, 12)
                     
                     Spacer()
                     
