@@ -8,7 +8,6 @@
 import Foundation
 
 struct APIKeyManager {
-    
     /// Safely retrieves the API_KEY from the app's Info.plist
     static var apiKey: String {
         guard let key = Bundle.main.object(forInfoDictionaryKey: "API_KEY") as? String else {
