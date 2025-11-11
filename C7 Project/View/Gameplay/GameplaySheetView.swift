@@ -5,6 +5,7 @@
 //  Created by Jason Miracle Gunawan on 30/10/25.
 //
 
+
 import SwiftUI
 import FoundationModels
 
@@ -101,7 +102,33 @@ struct GameplaySheetView: View {
                     
                 } else {
                     
-                    if viewModel.isDraftMode {
+                    // Show model loading state
+                    if viewModel.isModelLoading {
+                        VStack(spacing: 12) {
+                            ProgressView()
+                            Text("Loading speech model...")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                        
+                    } else if let error = viewModel.modelLoadError {
+                        VStack(spacing: 12) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.largeTitle)
+                                .foregroundStyle(.red)
+                            Text("Model Load Error")
+                                .font(.headline)
+                            Text(error)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                        
+                    } else if viewModel.isDraftMode {
                         HStack {
                             Button(action: {
                                 viewModel.cancelDraft()
@@ -170,7 +197,7 @@ struct GameplaySheetView: View {
                         
                     } else {
                         
-                        let isMicDisabled = !viewModel.permissionsGranted || viewModel.isWaitingForAIResponse
+                        let isMicDisabled = !viewModel.permissionsGranted || viewModel.isWaitingForAIResponse || viewModel.isModelLoading
                         
                         Button(action: {
                             viewModel.startRecording()

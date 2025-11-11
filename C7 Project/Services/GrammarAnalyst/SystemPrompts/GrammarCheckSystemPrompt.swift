@@ -37,6 +37,8 @@ nonisolated func checkAllCategories(forTask task: String) -> String {
     Subject-verb Agreement: Look for mismatches between a subject and its verb (e.g., "He walk", "They walks"). Correct any agreement errors you find.
     Modality: Look for incorrect use of modal verbs (e.g., "I can to go") or incorrect forms for hypothetical/conditional sentences (e.g., "If I am rich, I will buy a car"). Correct any modal errors you find.
     Word Formation (Morphology): Scrutinize the text for words that use the correct root concept but the wrong form (e.g., using an adjective like "clear" when an adverb "clearly" or a noun "clarity" is required). Correct any such errors you find.
+    Preposition Choice: Look for prepositions that are grammatically incorrect for their specific context, often due to direct translation from broader Indonesian equivalents (e.g., "live at Jakarta" -> "live in Jakarta", "angry with you" -> "angry at you"). Correct any incorrect prepositions you find.
+    Noun Possesive Error: Look for missing possessive markers (apostrophe 's) where possession is indicated by word order alone, typical of Bahasa Indonesia transfer (e.g., "friend car" -> "friend's car"). Correct any such possession errors you find.
 
     TEXT:
     "\(task)"
