@@ -17,6 +17,9 @@ class GameplayViewModel {
     var isWaitingForAIResponse: Bool = false
     var permissionsGranted: Bool = false
     
+//    view models for evaluation
+    var interpretationViewModel = InterpretationEvaluationViewModel()
+    
     private let story: StoryDetail
     private var speechManager = SpeechManager()
     private let followUpGenerator = FollowUpQuestion()
@@ -83,6 +86,7 @@ class GameplayViewModel {
         print("--- MESSAGE SENT ---")
         
         chatHistory.append(ChatMessage(text: messageText, isSent: true))
+        interpretationViewModel.appendAnswer(messageText)
         cancelDraft()
         
         isWaitingForAIResponse = true
@@ -104,21 +108,7 @@ class GameplayViewModel {
     private func addInitialPrompt() {
         if chatHistory.isEmpty {
             chatHistory.append(ChatMessage(text: story.initialPrompt, isSent: false))
-        }
-    }
-    
-    private func getDummyAIResponse() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            let aiResponse = "That’s great! What kind of tools did you implement to improve the workflow?"
-            print("AI RESPONSE: \(aiResponse)")
-            self.chatHistory.append(ChatMessage(text: aiResponse, isSent: false))
-            
-            if self.chatHistory.count > 3 {
-                print("--- CONVERSATION DONE ---")
-                self.isFinished = true
-            }
-            
-            self.isWaitingForAIResponse = false
+            interpretationViewModel.appendPrompt(story.initialPrompt)
         }
     }
     
@@ -150,6 +140,7 @@ class GameplayViewModel {
             )
             
             chatHistory.append(ChatMessage(text: followUp, isSent: false))
+            interpretationViewModel.appendPrompt(followUp)
             
             if chatHistory.count > 6 {
                 isFinished = true

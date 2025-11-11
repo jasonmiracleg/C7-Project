@@ -87,7 +87,7 @@ struct GameplaySheetView: View {
                         .fontWeight(.bold)
                     Text("Now, Let's review how you did")
                         .padding(.bottom, 12)
-                    NavigationLink(destination: EvaluationView()) {
+                    NavigationLink(destination: EvaluationView(interpretationViewModel: viewModel.interpretationViewModel)) {
                         Text("View Evaluation")
                             .padding(12)
                             .frame(maxWidth: .infinity)

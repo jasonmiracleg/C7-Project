@@ -16,12 +16,15 @@ enum tabSegments: String, CaseIterable{
 struct EvaluationView: View {
     @State private var selectedSegment: tabSegments = .pronunciation
     
+    @StateObject var interpretationViewModel: InterpretationEvaluationViewModel
+    
     @State private var showingPronunciationPopup = false
     @State private var pronunciationCorrection = ""
     
-    
     @State private var showingGrammarPopup = false
     @State private var selectedGrammarDetail: GrammarEvaluationDetail? = nil
+    
+    
     
     var body: some View {
         VStack(spacing: 0) {
@@ -39,7 +42,8 @@ struct EvaluationView: View {
                 showingPronunciationPopup: $showingPronunciationPopup,
                 pronunciationCorrection: $pronunciationCorrection,
                 showingGrammarPopup: $showingGrammarPopup,
-                selectedGrammarDetail: $selectedGrammarDetail
+                selectedGrammarDetail: $selectedGrammarDetail,
+                interpretationViewModel: interpretationViewModel
             )
             
             Spacer()
@@ -67,6 +71,7 @@ struct chosenTabView: View {
     @Binding var pronunciationCorrection: String
     @Binding var showingGrammarPopup: Bool
     @Binding var selectedGrammarDetail: GrammarEvaluationDetail?
+    @StateObject var interpretationViewModel: InterpretationEvaluationViewModel
     
     var body: some View {
         switch selectedTab {
@@ -78,11 +83,11 @@ struct chosenTabView: View {
                     selectedGrammarDetail: $selectedGrammarDetail
                 )
             case .interpretation:
-                InterpretationEvaluationView()
+            InterpretationEvaluationView(viewModel: interpretationViewModel)
         }
     }
 }
 
 #Preview {
-    EvaluationView()
+    EvaluationView(interpretationViewModel: InterpretationEvaluationViewModel())
 }
