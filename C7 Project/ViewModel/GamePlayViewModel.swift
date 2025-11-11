@@ -25,37 +25,58 @@ class GameplayViewModel {
         speechManager.isRecording
     }
     
+    var isModelLoading: Bool {
+        speechManager.isModelLoading
+    }
+    
+    var modelLoadError: String? {
+        speechManager.modelLoadError
+    }
+    
     var isDraftMode: Bool {
         !transcriptDraft.isEmpty && !isRecording
     }
     
     var lastAIQuestion: String? {
-        // Second to last from chatHistory
-        guard chatHistory.count >= 2 else { return nil}
-        
+        guard chatHistory.count >= 2 else { return nil }
         let AImessage = chatHistory[chatHistory.count - 2]
-        
-        // isSent must be false
         return !AImessage.isSent ? AImessage.text : nil
     }
     
     var lastUserAnswer: String? {
-        // Last message from chatHistory
         guard let lastMessage = chatHistory.last else { return nil }
-        
         return lastMessage.isSent ? lastMessage.text : nil
     }
     
     init(story: StoryDetail) {
         self.story = story
+        
+        // Setup transcript callback
+        speechManager.onTranscriptUpdate = { [weak self] transcript in
+            guard let self = self else { return }
+            Task { @MainActor in
+                self.transcriptDraft = transcript
+                print("📝 Draft updated via callback: \(transcript)")
+            }
+        }
     }
     
     func onAppear() {
         requestPermissions()
         addInitialPrompt()
+        
+        // Load WhisperKit model
+        Task {
+            await speechManager.loadModel()
+        }
     }
     
     func startRecording() {
+        guard !isModelLoading else {
+            print("⚠️ Model still loading...")
+            return
+        }
+        
         do {
             try speechManager.startRecording()
             print("--- START RECORDING ---")
@@ -67,7 +88,28 @@ class GameplayViewModel {
     func stopRecording() {
         speechManager.stopRecording()
         print("--- STOP RECORDING ---")
-        self.transcriptDraft = speechManager.transcript
+        
+        // Poll for transcript updates
+        Task {
+            // Wait for transcription to complete
+            for _ in 0..<20 { // Poll for up to 2 seconds
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 sec
+                
+                await MainActor.run {
+                    let currentTranscript = speechManager.transcript
+                    if !currentTranscript.isEmpty && currentTranscript != self.transcriptDraft {
+                        self.transcriptDraft = currentTranscript
+                        print("📝 Draft updated: \(currentTranscript)")
+                        return
+                    }
+                }
+                
+                // Break early if we got a transcript
+                if !self.transcriptDraft.isEmpty {
+                    break
+                }
+            }
+        }
     }
     
     func cancelDraft() {
@@ -88,7 +130,7 @@ class GameplayViewModel {
         isWaitingForAIResponse = true
         
         Task {
-            print("--- AI PROSES NEXT FOLLOW UP QUESTION (Mic Disabled) ---")
+            print("--- AI PROCESS NEXT FOLLOW UP QUESTION (Mic Disabled) ---")
             await generateFollowUpQuestion()
         }
     }
@@ -107,21 +149,6 @@ class GameplayViewModel {
         }
     }
     
-    private func getDummyAIResponse() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            let aiResponse = "That’s great! What kind of tools did you implement to improve the workflow?"
-            print("AI RESPONSE: \(aiResponse)")
-            self.chatHistory.append(ChatMessage(text: aiResponse, isSent: false))
-            
-            if self.chatHistory.count > 3 {
-                print("--- CONVERSATION DONE ---")
-                self.isFinished = true
-            }
-            
-            self.isWaitingForAIResponse = false
-        }
-    }
-    
     @MainActor
     private func generateFollowUpQuestion() async {
         print("DEBUG CHAT HISTORY:")
@@ -131,7 +158,6 @@ class GameplayViewModel {
 
         print("DEBUG lastAIQuestion:", lastAIQuestion ?? "nil")
         print("DEBUG lastUserAnswer:", lastUserAnswer ?? "nil")
-
         
         guard let previousAI = lastAIQuestion,
               let lastUserAnswer = lastUserAnswer else {
@@ -139,12 +165,11 @@ class GameplayViewModel {
             return
         }
         
-        // Optional delay if you want to simulate AI thinking
         try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 sec
         
         do {
             let followUp = try await followUpGenerator.generateFollowUpQuestion(
-                scenario: story.storyContext,   // ✅ scenario context stays here
+                scenario: story.storyContext,
                 question: previousAI,
                 userAnswer: lastUserAnswer
             )
@@ -160,5 +185,4 @@ class GameplayViewModel {
         
         isWaitingForAIResponse = false
     }
-
 }

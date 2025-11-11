@@ -11,9 +11,7 @@ struct ContextScenarioView: View {
     let scenario: Scenario
     
     @StateObject private var viewModel = RandomScenarioViewModel()
-    
     @State private var selectedStory: StoryDetail?
-    
     @State private var showGameplaySheet = false
     
     @Environment(\.dismiss) private var dismiss
@@ -32,46 +30,62 @@ struct ContextScenarioView: View {
                 }
                 .buttonStyle(.glass)
             }
-            
-            Spacer()
+            .padding(.horizontal, 24)
+
             
             if let story = selectedStory {
-                Text(story.storyContext)
-                    .padding(12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.gray.opacity(0.2))
-                    )
-                    .overlay(alignment: .bottom) {
-                        Triangle()
-                            .fill(Color.gray.opacity(0.2))
-                            .frame(width:30, height: 20)
-                            .offset(x: -40, y: 20)
-                    }
-                Image("Context")
-                    .resizable()
-                    .frame(width: 350, height: 350)
-                    .padding(.top, -24)
-                Spacer()
                 
-                Button("START YOUR CONVERSATION") {
-                    showGameplaySheet = true
+                Text(story.mainTopic)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 16)
+                    .padding(.horizontal, 16)
+
+                VStack {
+                    Spacer()
+
+                    Text(story.storyContext)
+                        .padding(12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.gray.opacity(0.2))
+                        )
+                        .overlay(alignment: .bottom) {
+                            Triangle()
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(width:30, height: 20)
+                                .offset(x: 50, y: 20)
+                        }
+                    
+                    Image("Context")
+                        .resizable()
+                        .frame(width: 350, height: 350)
+//                        .background(.red)
+                        .padding(.top, 12)
+                    
+                    Spacer()
+                    
+                    Button("START YOUR CONVERSATION") {
+                        showGameplaySheet = true
+                    }
+                    .font(.headline)
+                    .padding(24)
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        Capsule()
+                            .fill(Color.interactive)
+                    )
+                    .foregroundStyle(Color.white)
                 }
-                .font(.headline)
-                .padding(24)
-                .frame(maxWidth: .infinity)
-                .background(
-                    Capsule()
-                        .fill(Color.accentColor.opacity(0.8))
-                )
-                .foregroundStyle(Color.white)
+                .padding(.horizontal, 24)
                 
             } else {
+                Spacer()
                 ProgressView("Loading Story...")
-                Text(scenario.title)
+                Spacer()
             }
         }
-        .padding(.horizontal, 24)
         .onAppear {
             if selectedStory == nil {
                 self.selectedStory = viewModel.getRandomStory(for: scenario.title)
@@ -82,10 +96,8 @@ struct ContextScenarioView: View {
                 GameplaySheetView(story: story)
             }
         }
-        .padding(.horizontal, 24)
     }
 }
-
 #Preview {
     let sampleScenario = Scenario(
         title: "Presenting",

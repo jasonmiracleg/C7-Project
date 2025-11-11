@@ -68,16 +68,23 @@ struct OnboardingHalfModalView: View {
                     .padding(.bottom, 48)
                 
                 HStack {
-                    Button(action: {
-                        currentAppState = .disclaimer
-                    }) {
-                        Text("SKIP")
-                            .font(.headline)
-                            .padding()
-                            .foregroundColor(.main)
+                    if step < (steps.count - 1) {
+                        Button(action: {
+                            currentAppState = .disclaimer
+                        }) {
+                            Text("SKIP")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 24)
+                                .background(Color.gray.opacity(0.8))
+                                .foregroundColor(.white)
+                                .cornerRadius(50)
+                        }
+                        .padding(.trailing, 24)
                     }
                     
-                    Spacer()
+                    //                    Spacer()
                     
                     Button(action: {
                         if step < (steps.count - 1) {
@@ -96,9 +103,10 @@ struct OnboardingHalfModalView: View {
                                 Image(systemName:"arrow.right")
                             }
                         }
+                        .frame(minWidth: 120)
                         .padding(.vertical, 12)
                         .padding(.horizontal, 24)
-                        .background(Color.main)
+                        .background(Color.interactive)
                         .foregroundColor(.white)
                         .cornerRadius(50)
                     }
@@ -113,7 +121,7 @@ struct OnboardingHalfModalView: View {
                 //                    .shadow(radius: 10)
             )
             
-//            .animation(.easeInOut, value: step)
+            //            .animation(.easeInOut, value: step)
         }
         .ignoresSafeArea(edges: .bottom)
         .background(.main)
