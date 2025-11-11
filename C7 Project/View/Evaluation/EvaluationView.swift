@@ -47,9 +47,9 @@ struct EvaluationView: View {
         }
         .navigationTitle("Evaluation")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(item: $selectedGrammarDetail) { detail in
-            DetailEvaluationModal(detail: detail)
-        }
+//        .sheet(item: $selectedGrammarDetail) { detail in
+//            DetailEvaluationModal(detail: detail)
+//        }
         .sheet(isPresented: $showingPronunciationPopup) {
             PronunciationPopup(
                 correctionText: $pronunciationCorrection,
@@ -73,10 +73,7 @@ struct chosenTabView: View {
             case .pronunciation:
                 PronunciationEvaluationView(showingPronunciationPopup: $showingPronunciationPopup, pronunciationCorrection: $pronunciationCorrection)
             case .grammar:
-                GrammarEvaluationView(
-                    showingPopup: $showingGrammarPopup,
-                    selectedGrammarDetail: $selectedGrammarDetail
-                )
+                GrammarEvaluationView()
             case .interpretation:
                 InterpretationEvaluationView()
         }
