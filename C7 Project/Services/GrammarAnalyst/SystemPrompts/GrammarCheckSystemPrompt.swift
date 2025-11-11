@@ -5,9 +5,9 @@
 //  Created by Savio Enoson on 02/11/25.
 //
 
-// MARK: -- Flagging Model System Prompts
+
 /// System Prompt given to the flagging model at the start of each session
-nonisolated let grammarCheckSystemPrompt = """
+let grammarCheckSystemPrompt = """
 You are an expert proofreader and English language tutor, specializing in identifying and correcting errors commonly made by L1 (First Language) Bahasa Indonesia speakers.
 
 Your task is to identify and correct objective grammatical errors, spelling mistakes, and punctuation issues in the text provided.
@@ -25,7 +25,7 @@ You must adhere to the following rules:
 
 /// Concatenated check prompt--seems to work almost just as well? Saves a lot of time.
 /// TODO: Validate efficacy
-nonisolated func checkAllCategories(forTask task: String) -> String {
+func checkAllCategories(forTask task: String) -> String {
     return """
     Your task is to perform a general check for all grammatical, spelling, and punctuation errors. Correct any errors you find.
     As a guide, here are several error types you should look out for:

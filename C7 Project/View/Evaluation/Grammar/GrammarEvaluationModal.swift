@@ -108,20 +108,24 @@ struct GrammarEvaluationModal: View {
         let sentenceStartOffset = detail.originalText.distance(from: detail.originalText.startIndex, to: sentenceRange.lowerBound)
         let sentenceEndOffset = sentenceStartOffset + originalSentence.count
         
-        let allErrors = detail.errors.flatMap { (type, list) in list.map { (error: $0, type: type) } }
-
-        for (error, type) in allErrors {
-            if error.originalEndChar > sentenceStartOffset && error.originalStartChar < sentenceEndOffset {
-                let relativeStart = max(0, error.originalStartChar - sentenceStartOffset)
-                let relativeEnd = min(originalSentence.count, error.originalEndChar - sentenceStartOffset)
-                
-                if relativeStart < relativeEnd {
-                    let startIdx = originalSentence.index(originalSentence.startIndex, offsetBy: relativeStart)
-                    let endIdx = originalSentence.index(originalSentence.startIndex, offsetBy: relativeEnd)
-                    let rangeToHighlight = startIdx..<endIdx
+        for (type, errors) in sentenceErrors {
+            for error in errors {
+                if error.originalEndChar > sentenceStartOffset && error.originalStartChar < sentenceEndOffset {
+                    let relativeStart = max(0, error.originalStartChar - sentenceStartOffset)
+                    let relativeEnd = min(originalSentence.count, error.originalEndChar - sentenceStartOffset)
                     
-                    if let attrRange = attributedString.range(of: originalSentence[rangeToHighlight]) {
+                    if relativeStart < relativeEnd {
+                        let startIdx = originalSentence.index(originalSentence.startIndex, offsetBy: relativeStart)
+                        let endIdx = originalSentence.index(originalSentence.startIndex, offsetBy: relativeEnd)
+                        
+                        guard let attrStart = AttributedString.Index(startIdx, within: attributedString),
+                              let attrEnd = AttributedString.Index(endIdx, within: attributedString) else {
+                            continue
+                        }
+                        let attrRange = attrStart..<attrEnd
+                        
                         attributedString[attrRange].font = .body.italic()
+                        attributedString[attrRange].backgroundColor = type.color.opacity(0.25)
                         attributedString[attrRange].underlineStyle = Text.LineStyle(pattern: .solid, color: type.color)
                     }
                 }
@@ -138,21 +142,26 @@ struct GrammarEvaluationModal: View {
         let sentenceStartOffset = detail.correctedText.distance(from: detail.correctedText.startIndex, to: sentenceRange.lowerBound)
         let sentenceEndOffset = sentenceStartOffset + correctedSentence.count
         
-        let allErrors = detail.errors.flatMap { (type, list) in list.map { (error: $0, type: type) } }
-
-        for (error, type) in allErrors {
-            if error.correctedEndChar > sentenceStartOffset && error.correctedStartChar < sentenceEndOffset {
-                let relativeStart = max(0, error.correctedStartChar - sentenceStartOffset)
-                let relativeEnd = min(correctedSentence.count, error.correctedEndChar - sentenceStartOffset)
-                
-                if relativeStart < relativeEnd {
-                    let startIdx = correctedSentence.index(correctedSentence.startIndex, offsetBy: relativeStart)
-                    let endIdx = correctedSentence.index(correctedSentence.startIndex, offsetBy: relativeEnd)
-                    let rangeToHighlight = startIdx..<endIdx
+        for (type, errors) in sentenceErrors {
+            for error in errors {
+                if error.correctedEndChar > sentenceStartOffset && error.correctedStartChar < sentenceEndOffset {
+                    let relativeStart = max(0, error.correctedStartChar - sentenceStartOffset)
+                    let relativeEnd = min(correctedSentence.count, error.correctedEndChar - sentenceStartOffset)
                     
-                    if let attrRange = attributedString.range(of: correctedSentence[rangeToHighlight]) {
-                         attributedString[attrRange].font = .body.italic()
-                         attributedString[attrRange].underlineStyle = Text.LineStyle(pattern: .solid, color: type.color)
+                    if relativeStart < relativeEnd {
+                        let startIdx = correctedSentence.index(correctedSentence.startIndex, offsetBy: relativeStart)
+                        let endIdx = correctedSentence.index(correctedSentence.startIndex, offsetBy: relativeEnd)
+                        
+                        guard let attrStart = AttributedString.Index(startIdx, within: attributedString),
+                              let attrEnd = AttributedString.Index(endIdx, within: attributedString) else {
+                            continue
+                        }
+                        let attrRange = attrStart..<attrEnd
+                        
+                        // Apply styles
+                        attributedString[attrRange].font = .body.italic()
+                        attributedString[attrRange].backgroundColor = type.color.opacity(0.15)
+                        attributedString[attrRange].underlineStyle = Text.LineStyle(pattern: .solid, color: type.color)
                     }
                 }
             }
@@ -174,7 +183,9 @@ struct ErrorTypeSection: View {
                 .font(.headline)
                 .foregroundStyle(type.color)
             
-            Divider()
+            Text(type.shortDescription)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
             
             // List of Correction Cards for this type
             ForEach(errors) { error in
@@ -207,7 +218,7 @@ struct CorrectionCard: View {
                     .font(.system(.body, design: .monospaced))
                     .fontWeight(.semibold)
                     .padding(6)
-                    .background(type.color.opacity(0.1))
+                    .background(type.color.opacity(0.5))
                     .cornerRadius(6)
             }
             
