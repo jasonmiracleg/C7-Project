@@ -35,7 +35,7 @@ struct GrammarEvaluationView: View {
         .sheet(isPresented: $viewModel.isShowingDetailPopup) {
             if let detail = viewModel.selectedDetail,
                let index = viewModel.selectedSentenceIndex {
-                // Initialize modal with full context
+                // Pass the full detail and index
                 GrammarEvaluationModal(detail: detail, sentenceIndex: index)
                     .presentationDetents([.medium, .large])
             }

@@ -16,6 +16,10 @@ struct GrammarEvaluationDetail: Identifiable, Equatable {
     var errors: [SyntacticErrorType: [GrammarError]]
     var isLoading: Bool = false
     
+    var totalErrorCount: Int {
+        errors.values.reduce(0) { $0 + $1.count }
+    }
+    
     // Helper to split original text into sentences
     var originalSentences: [String] {
         var results: [String] = []
@@ -43,7 +47,9 @@ struct GrammarEvaluationDetail: Identifiable, Equatable {
     
     /// Finds the range of the Nth sentence in the corrected text.
     func correctedSentenceRange(at index: Int) -> Range<String.Index>? {
-        findSentenceRange(in: correctedText, at: index)
+        // Safeguard against empty corrected text if analysis failed
+        guard !correctedText.isEmpty else { return nil }
+        return findSentenceRange(in: correctedText, at: index)
     }
     
     private func findSentenceRange(in text: String, at targetIndex: Int) -> Range<String.Index>? {
@@ -80,39 +86,5 @@ struct GrammarEvaluationDetail: Identifiable, Equatable {
         }
         
         return errorsInSentence
-    }
-}
-
-// (Keep your SyntacticErrorType extension here as it was)
-extension SyntacticErrorType {
-    var color: Color {
-        switch self {
-        // Using slightly darker/richer shades for better contrast on both light/dark modes
-        case .VerbTenses: return Color(red: 0.8, green: 0.1, blue: 0.1)         // Darker Red
-        case .SubjectVerbAgreement: return Color(red: 0.85, green: 0.45, blue: 0.0) // Darker Orange
-        case .ArticleOmission: return Color(red: 0.0, green: 0.4, blue: 0.8)      // Darker Blue
-        case .PluralNounSuffix: return Color(red: 0.6, green: 0.1, blue: 0.6)     // Darker Purple
-        case .CopulaOmission: return Color(red: 0.85, green: 0.1, blue: 0.5)      // Darker Pink
-        case .WordOrder: return Color(red: 0.8, green: 0.65, blue: 0.0)           // Gold (Darker Yellow) - vital for light mode
-        case .WordFormation: return Color(red: 0.0, green: 0.6, blue: 0.2)        // Darker Green
-        case .IncorrectPreposition: return Color(red: 0.0, green: 0.6, blue: 0.7) // Teal (Darker Cyan) - vital for light mode
-        case .NounPossesiveError: return Color(red: 0.6, green: 0.4, blue: 0.2)   // Brown
-        case .Unknown: return Color.gray
-        }
-    }
-    
-    var title: String {
-        switch self {
-        case .VerbTenses: return "Verb Tense"
-        case .SubjectVerbAgreement: return "Subject-Verb Agreement"
-        case .ArticleOmission: return "Article Omission"
-        case .PluralNounSuffix: return "Plural Noun Suffix"
-        case .CopulaOmission: return "Copula Omission"
-        case .WordOrder: return "Word Order"
-        case .WordFormation: return "Word Formation"
-        case .IncorrectPreposition: return "Incorrect Preposition"
-        case .NounPossesiveError: return "Noun Possessive Error"
-        case .Unknown(let type): return "Other Error (\(type))"
-        }
     }
 }

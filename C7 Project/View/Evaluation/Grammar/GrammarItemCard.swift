@@ -9,6 +9,7 @@ import SwiftUI
 
 struct GrammarItemCard: View {
     let detail: GrammarEvaluationDetail
+    
     @Binding var selectedDetail: GrammarEvaluationDetail?
     @Binding var selectedSentenceIndex: Int?
     @Binding var isShowingPopup: Bool
