@@ -16,10 +16,18 @@ class GameplayViewModel {
     var isFinished: Bool = false
     var isWaitingForAIResponse: Bool = false
     var permissionsGranted: Bool = false
+    var timeDisplay: String = "01.00"
+    var canStopRecording: Bool = false
+    var isTimeRunningOut: Bool = false
     
     private let story: StoryDetail
     private var speechManager = SpeechManager()
     private let followUpGenerator = FollowUpQuestion()
+    private var timer: Timer?
+    private var secondsElapsed: Int = 0
+    private let maxRecordTime: Int = 60
+    private let minRecordTime: Int = 15
+    private let warningTime: Int = 15
     
     var isRecording: Bool {
         speechManager.isRecording
@@ -48,6 +56,7 @@ class GameplayViewModel {
     
     init(story: StoryDetail) {
         self.story = story
+        self.timeDisplay = formatTime(maxRecordTime)
     }
     
     func onAppear() {
@@ -59,12 +68,25 @@ class GameplayViewModel {
         do {
             try speechManager.startRecording()
             print("--- START RECORDING ---")
+            
+            secondsElapsed = 0
+            canStopRecording = false
+            timeDisplay = formatTime(maxRecordTime)
+            
+            isTimeRunningOut = false
+            
+            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+                self?.onTimerTick()
+            }
         } catch {
             print("ERROR: FAILED TO START RECORDING: \(error.localizedDescription)")
         }
     }
     
     func stopRecording() {
+        timer?.invalidate()
+        timer = nil
+        
         speechManager.stopRecording()
         print("--- STOP RECORDING ---")
         self.transcriptDraft = speechManager.transcript
@@ -74,6 +96,8 @@ class GameplayViewModel {
         print("--- DRAFT CANCELED ---")
         self.transcriptDraft = ""
         speechManager.transcript = ""
+        
+        resetTimerDisplay()
     }
     
     func sendMessage() {
@@ -122,16 +146,51 @@ class GameplayViewModel {
         }
     }
     
+    private func onTimerTick() {
+        secondsElapsed += 1
+        
+        let remainingTime = maxRecordTime - secondsElapsed
+        timeDisplay = formatTime(remainingTime)
+        
+        if secondsElapsed >= minRecordTime {
+            canStopRecording = true
+        }
+        
+        if remainingTime <= warningTime {
+                    isTimeRunningOut = true
+                }
+        
+        if secondsElapsed >= maxRecordTime {
+            print("Times Up...")
+            stopRecording()
+        }
+        
+    }
+    private func resetTimerDisplay() {
+        timeDisplay = formatTime(maxRecordTime)
+        secondsElapsed = 0
+        canStopRecording = false
+        isTimeRunningOut = false
+    }
+    
+    private func formatTime(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let remainingSeconds = seconds % 60
+        let mm = String(format: "%02d", minutes)
+        let ss = String(format: "%02d", remainingSeconds)
+        return "\(mm).\(ss)"
+    }
+    
     @MainActor
     private func generateFollowUpQuestion() async {
         print("DEBUG CHAT HISTORY:")
         for (index, msg) in chatHistory.enumerated() {
             print("[\(index)] \(msg.text) | isSent: \(msg.isSent)")
         }
-
+        
         print("DEBUG lastAIQuestion:", lastAIQuestion ?? "nil")
         print("DEBUG lastUserAnswer:", lastUserAnswer ?? "nil")
-
+        
         
         guard let previousAI = lastAIQuestion,
               let lastUserAnswer = lastUserAnswer else {
@@ -160,5 +219,5 @@ class GameplayViewModel {
         
         isWaitingForAIResponse = false
     }
-
+    
 }

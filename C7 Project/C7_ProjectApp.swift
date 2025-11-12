@@ -25,8 +25,8 @@ struct C7_ProjectApp: App {
 
     var body: some Scene {
         WindowGroup {
-//            ContentView()
-            FineTuningView()
+            ContentView()
+//            FineTuningView()
         }
         .modelContainer(sharedModelContainer)
     }
