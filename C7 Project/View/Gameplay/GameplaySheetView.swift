@@ -28,14 +28,11 @@ struct GameplaySheetView: View {
                     HStack(alignment: VerticalAlignment.center) {
                         HStack(alignment: VerticalAlignment.center) {
                             Image(systemName: "clock.fill")
-                                .foregroundStyle(viewModel.isTimeRunningOut ? .red : Color(.black.opacity(0.8)))
-                                .font(.body)
-                            Text(viewModel.timeDisplay)
-                                .foregroundStyle(viewModel.isTimeRunningOut ? .red : .primary)
-                                .fontWeight(viewModel.isTimeRunningOut ? .bold : .regular)
+                                .foregroundStyle(Color(.black.opacity(0.8)))
+                                .font(Font.system(size: 18))
+                            Text("02:40")
+                                .font(.subheadline)
                         }
-                        .animation(.easeInOut, value: viewModel.isTimeRunningOut)
-                        
                         Spacer()
                         Text("Gameplay")
                             .font(.title2)
@@ -200,10 +197,9 @@ struct GameplaySheetView: View {
                                 .padding(18)
                                 .background(
                                     Circle()
-                                        .fill(viewModel.canStopRecording ? Color.interactive : Color.gray.opacity(0.5))
+                                        .fill(Color.interactive)
                                 )
                         }
-                        .disabled(!viewModel.canStopRecording)
                         
                     } else {
                         
