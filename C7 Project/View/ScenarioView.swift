@@ -4,10 +4,16 @@
 //
 //  Created by Maria Angelica Vinesytha Chandrawan on 01/11/25.
 //
+
 import SwiftUI
+import FoundationModels
 
 struct ScenarioView: View {
     @State private var selectedScenario: Scenario?
+    
+    private var model = SystemLanguageModel.default
+    @State private var showAlert = false
+    @State private var availabilityMessage = ""
     
 
     let scenariosData: [Scenario] = [
@@ -24,7 +30,7 @@ struct ScenarioView: View {
                 VStack(alignment: .leading) {
                     ForEach(scenariosData) { scenario in
                         Button(action: {
-                            selectedScenario = scenario
+                            handleScenarioTap(scenario)
                         }) {
                             ScenarioCard(scenario: scenario)
                                 .padding(.bottom, 4)
@@ -39,6 +45,30 @@ struct ScenarioView: View {
         }
         .fullScreenCover(item: $selectedScenario) { scenario in
             ContextScenarioView(scenario: scenario)
+        }
+        .alert("Apple Intelligence Unavailable", isPresented: $showAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(availabilityMessage)
+        }
+    }
+    
+    private func handleScenarioTap(_ scenario: Scenario) {
+        switch model.availability {
+        case .available:
+            selectedScenario = scenario
+        case .unavailable(.deviceNotEligible):
+            availabilityMessage = "This device does not have Apple Intelligence."
+            showAlert = true
+        case .unavailable(.appleIntelligenceNotEnabled):
+            availabilityMessage = "Please enable Apple Intelligence in Settings."
+            showAlert = true
+        case .unavailable(.modelNotReady):
+            availabilityMessage = "Apple Intelligence is still loading. Try again in a moment."
+            showAlert = true
+        case .unavailable(let reason):
+            availabilityMessage = "Unavailable: \(String(describing: reason))"
+            showAlert = true
         }
     }
 }
