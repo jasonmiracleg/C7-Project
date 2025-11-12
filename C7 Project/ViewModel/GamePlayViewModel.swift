@@ -237,6 +237,7 @@ class GameplayViewModel {
             )
             
             chatHistory.append(ChatMessage(text: followUp, isSent: false))
+            interpretationViewModel.appendPrompt(followUp)
             
             if chatHistory.count > 6 {
                 isFinished = true

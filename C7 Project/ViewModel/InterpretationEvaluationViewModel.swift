@@ -73,7 +73,6 @@ class InterpretationEvaluationViewModel: ObservableObject {
     func appendAnswer(_ answer: String){
         answers.append(answer)
         
-        
         // checks with a current index thingy
         if let prompt = prompts[safe: currentIndex],
            let answer = answers[safe: currentIndex] {

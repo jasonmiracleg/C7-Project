@@ -31,12 +31,12 @@ struct InterpretationEvaluationView: View {
             .padding(.horizontal)
             .padding(.vertical, 8)
         }
-        .task {
-            // empty task for actual running
-            viewModel.appendPrompt("Pitch your skills to the HR before the elevator reaches the ground floor!")
-            viewModel.appendAnswer("I'm a self-described, born entrepreneur, from an early age I've always been eager to run a business.")
-            
-        }
+//        .task {
+//            // empty task for actual running
+//            viewModel.appendPrompt("Pitch your skills to the HR before the elevator reaches the ground floor!")
+//            viewModel.appendAnswer("I'm a self-described, born entrepreneur, from an early age I've always been eager to run a business.")
+//            
+//        }
     }
 
 }
