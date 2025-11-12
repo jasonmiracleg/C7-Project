@@ -42,7 +42,7 @@ struct GameplaySheetView: View {
                         }) {
                             Image(systemName: "xmark")
                                 .font(.system(size: 24))
-                                .foregroundStyle(.black)
+                                .foregroundStyle(.primary)
                                 .clipShape(Circle())
                         }
                         .buttonStyle(.glass)
@@ -80,6 +80,7 @@ struct GameplaySheetView: View {
                 }
                 .padding(.top, 12)
                 .frame(height: 500)
+                
                 Spacer()
                 
                 if viewModel.isFinished {
@@ -88,7 +89,12 @@ struct GameplaySheetView: View {
                         .fontWeight(.bold)
                     Text("Now, Let's review how you did")
                         .padding(.bottom, 12)
-                    NavigationLink(destination: EvaluationView(interpretationViewModel: viewModel.interpretationViewModel)) {
+                    NavigationLink(
+                        destination: EvaluationView(
+                            grammarViewModel: viewModel.grammarViewModel,
+                            interpretationViewModel: viewModel.interpretationViewModel
+                        )
+                    ) {
                         Text("View Evaluation")
                             .padding(12)
                             .frame(maxWidth: .infinity)

@@ -91,6 +91,15 @@ struct GrammarEvaluationModal: View {
     
     private var correctionListSection: some View {
         VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading) {
+                Text("Corrections")
+                    .font(.headline)
+
+                Text("Rationale and corrections for each error.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            
             ForEach(Array(sentenceErrors.keys.sorted(by: { $0.title < $1.title })), id: \.self) { type in
                 if let errors = sentenceErrors[type] {
                     ErrorTypeSection(type: type, errors: errors)
@@ -179,13 +188,13 @@ struct ErrorTypeSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Header for the Error Type
-            Text(type.title)
-                .font(.headline)
-                .foregroundStyle(type.color)
-            
-            Text(type.shortDescription)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+//            Text(type.title)
+//                .font(.headline)
+//                .foregroundStyle(type.color)
+//            
+//            Text(type.shortDescription)
+//                .font(.subheadline)
+//                .foregroundStyle(.secondary)
             
             // List of Correction Cards for this type
             ForEach(errors) { error in
@@ -218,13 +227,13 @@ struct CorrectionCard: View {
                     .font(.system(.body, design: .monospaced))
                     .fontWeight(.semibold)
                     .padding(6)
-                    .background(type.color.opacity(0.5))
+                    .background(type.color.opacity(0.35))
                     .cornerRadius(6)
             }
             
             // Rationale text below
             Text(error.correctionRationale)
-                .font(.body)
+                .font(.subheadline)
                 .foregroundStyle(.primary)
                 .fixedSize(horizontal: false, vertical: true)
         }

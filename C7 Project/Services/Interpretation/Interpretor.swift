@@ -24,22 +24,52 @@ struct InterpretedText: Equatable {
 }
 
 
-actor Interpretor {
-    private let session: LanguageModelSession
+class Interpretor {
+    static let shared = Interpretor()
+    private var session: LanguageModelSession
     
-    init() {
-        // Initialize the model and session
+    private init() {
+        self.session = Self.createNewSession()
+    }
+    
+    private static func createNewSession() -> LanguageModelSession {
         let model = SystemLanguageModel(guardrails: .permissiveContentTransformations)
-        self.session = LanguageModelSession(model: model, instructions: interpretationModelInstructions)
+        return LanguageModelSession(model: model, instructions: interpretationModelInstructions)
     }
     
     func interpret(_ text: String) async throws -> InterpretedText {
+        while session.isResponding {
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        
+        // Debug: refresh session every time
+        self.session = Self.createNewSession()
         let prompt = interpretSystemPrompt(forTask: text)
-        let response = try await session.respond(
-            to: prompt,
-            generating: InterpretedText.self
-        )
-        return response.content
+        
+        do {
+            let response = try await session.respond(
+                to: prompt,
+                generating: InterpretedText.self
+            )
+            return response.content
+        } catch LanguageModelSession.GenerationError.exceededContextWindowSize(let context) {
+            print("Warning: Exceeded context window size. Context: \(context).")
+            print("Re-initializing interpretation session and retrying...")
+
+            // Re-initialize the session
+            self.session = Self.createNewSession()
+            
+            // Retry the request once
+            let response = try await session.respond(
+                to: prompt,
+                generating: InterpretedText.self
+            )
+            return response.content
+        } catch {
+            // Handle all other potential errors
+            print("An unexpected error occurred during interpretation: \(error)")
+            throw error
+        }
     }
     
 }

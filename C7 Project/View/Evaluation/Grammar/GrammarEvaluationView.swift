@@ -9,7 +9,7 @@ import SwiftUI
 
 struct GrammarEvaluationView: View {
     
-    @State private var viewModel = GrammarEvaluationViewModel()
+    @Bindable var viewModel: GrammarEvaluationViewModel
     
     var body: some View {
         ScrollView {
@@ -40,12 +40,10 @@ struct GrammarEvaluationView: View {
                     .presentationDetents([.medium, .large])
             }
         }
-        .task {
-            await viewModel.loadData()  // DEBUG: Remove during integration with gameplay loop
-        }
     }
 }
 
 #Preview {
-    GrammarEvaluationView()
+    // 3. MODIFY THIS: Update preview to inject a view model
+    GrammarEvaluationView(viewModel: GrammarEvaluationViewModel())
 }

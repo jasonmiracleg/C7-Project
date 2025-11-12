@@ -97,13 +97,22 @@ class InterpretationEvaluationViewModel: ObservableObject {
         }
     }
     
-
-    private func interpretText(at index: Int) async {
-        do {
-            let response = items[index].getResponse()
-            let result = try await interpretor.interpret(response)
-            await MainActor.run {
-                items[index].addInterpretation(result)
+    //    i expect it initially has InterpretedText as nil so this generates the points from spokenText
+    //  live updates
+    private func generateInterpretedPoints() async {
+        let interpretor = Interpretor.shared
+            
+        // need to use indices instead of iterating through items
+        // because it needs to access array, otherwise itll only provide a copy
+        for i in items.indices {
+            if items[i].interpretedText == nil {
+                currentTaskDescription = "Interpreting text \(i + 1): \(items[i].spokenText)"
+                do {
+                    let result = try await interpretor.interpret(items[i].spokenText)
+                    items[i].addInterpretation(result)
+                } catch {
+                    print("❌ Failed to interpret \(items[i].spokenText): \(error)")
+                }
             }
         } catch {
             print("❌ Failed to interpret \(items[index].getResponse()): \(error)")

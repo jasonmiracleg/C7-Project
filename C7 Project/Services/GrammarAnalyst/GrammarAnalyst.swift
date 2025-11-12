@@ -31,11 +31,13 @@ struct TextBlock {
 
 // MARK: - Grammar Analyst Actor
 class GrammarAnalyst {
+    static let shared = GrammarAnalyst()
+    
     let networkManager = NetworkManager.shared
     var grammarCheckSession: LanguageModelSession
     var rationaleGenerationSession: LanguageModelSession
     
-    init() {
+    private init() {
         // Initialize the syntactic-checker model session
         (self.grammarCheckSession, self.rationaleGenerationSession) = Self.createNewSession()
     }

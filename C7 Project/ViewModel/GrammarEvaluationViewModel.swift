@@ -11,15 +11,15 @@ import Observation
 
 @Observable
 class GrammarEvaluationViewModel {
+    // Dependencies
+    private let analyst = GrammarAnalyst.shared
+    private let networkManager = NetworkManager.shared
+    
     var evaluationDetails: [GrammarEvaluationDetail] = []
     
     var selectedDetail: GrammarEvaluationDetail?
     var selectedSentenceIndex: Int?
     var isShowingDetailPopup: Bool = false
-    
-    // Dependencies
-    private let analyst = GrammarAnalyst()
-    private let networkManager = NetworkManager.shared
     
     var totalSentences: Int {
         var total = 0

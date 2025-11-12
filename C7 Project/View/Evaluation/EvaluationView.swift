@@ -21,8 +21,9 @@ struct EvaluationView: View {
     @State private var showingPronunciationPopup = false
     @State private var pronunciationCorrection = ""
     
-    @State private var showingGrammarPopup = false
-    @State private var selectedGrammarDetail: GrammarEvaluationDetail? = nil
+    // View Models
+    let grammarViewModel: GrammarEvaluationViewModel
+    let interpretationViewModel: InterpretationEvaluationViewModel
     
     
     
@@ -41,8 +42,7 @@ struct EvaluationView: View {
                 selectedTab: selectedSegment,
                 showingPronunciationPopup: $showingPronunciationPopup,
                 pronunciationCorrection: $pronunciationCorrection,
-                showingGrammarPopup: $showingGrammarPopup,
-                selectedGrammarDetail: $selectedGrammarDetail,
+                grammarViewModel: grammarViewModel,
                 interpretationViewModel: interpretationViewModel
             )
             
@@ -51,9 +51,6 @@ struct EvaluationView: View {
         }
         .navigationTitle("Evaluation")
         .navigationBarTitleDisplayMode(.inline)
-//        .sheet(item: $selectedGrammarDetail) { detail in
-//            DetailEvaluationModal(detail: detail)
-//        }
         .sheet(isPresented: $showingPronunciationPopup) {
             PronunciationPopup(
                 correctionText: $pronunciationCorrection,
@@ -69,22 +66,26 @@ struct chosenTabView: View {
     
     @Binding var showingPronunciationPopup: Bool
     @Binding var pronunciationCorrection: String
-    @Binding var showingGrammarPopup: Bool
-    @Binding var selectedGrammarDetail: GrammarEvaluationDetail?
-    @StateObject var interpretationViewModel: InterpretationEvaluationViewModel
+    
+    // View Models
+    let grammarViewModel: GrammarEvaluationViewModel
+    let interpretationViewModel: InterpretationEvaluationViewModel
     
     var body: some View {
         switch selectedTab {
             case .pronunciation:
                 PronunciationEvaluationView(showingPronunciationPopup: $showingPronunciationPopup, pronunciationCorrection: $pronunciationCorrection)
             case .grammar:
-                GrammarEvaluationView()
+                GrammarEvaluationView(viewModel: grammarViewModel)
             case .interpretation:
-            InterpretationEvaluationView(viewModel: interpretationViewModel)
+                InterpretationEvaluationView(viewModel: interpretationViewModel)
         }
     }
 }
 
 #Preview {
-    EvaluationView(interpretationViewModel: InterpretationEvaluationViewModel())
+    EvaluationView(
+        grammarViewModel: GrammarEvaluationViewModel(),
+        interpretationViewModel: InterpretationEvaluationViewModel() // 5. UPDATE PREVIEW
+    )
 }
