@@ -1,35 +1,7 @@
 import Foundation
 import FoundationModels
 
-var numberOfErrors:Int = 3
 
-// Deprecated
-@Generable
-struct CorrectionResponse {
-    @Guide(description: "An array containing each correction rationale **in the same exact order.**", .count(numberOfErrors))
-    let errorRationales: [CorrectionRationale]
-}
-
-@Generable
-struct CorrectionRationale {
-    @Guide(description: "Populate this field with the associated error's `errorID`.")
-    let errorID: Int
-    
-    @Guide(description: "Populate this field with the correction rationale. This should be **no more than three short sentences.**")
-    let rationale: String
-}
-
-@Generable
-// Generable guide for the syntactic grammar-check model
-struct TextBlock {
-    @Guide(description: "Populate this field with the **original**, unedited input text.")
-    let originalText: String
-    
-    @Guide(description: "Populate this field with the **corrected** version of the input text.")
-    var correctedText: String = ""
-}
-
-// MARK: - Grammar Analyst Actor
 class GrammarAnalyst {
     static let shared = GrammarAnalyst()
     
@@ -38,11 +10,10 @@ class GrammarAnalyst {
     var rationaleGenerationSession: LanguageModelSession
     
     private init() {
-        // Initialize the syntactic-checker model session
-        (self.grammarCheckSession, self.rationaleGenerationSession) = Self.createNewSession()
+        (self.grammarCheckSession, self.rationaleGenerationSession) = Self.refreshModelSessions()
     }
     
-    private static func createNewSession() -> (LanguageModelSession, LanguageModelSession) {
+    private static func refreshModelSessions() -> (LanguageModelSession, LanguageModelSession) {
         let model = SystemLanguageModel(useCase: .general, guardrails: .permissiveContentTransformations)
         let gcSession = LanguageModelSession(model: model, instructions: grammarCheckSystemPrompt)
         let crSession = LanguageModelSession(model: model, instructions: correctionRationaleSystemPrompt)
@@ -58,6 +29,8 @@ class GrammarAnalyst {
         let model = SystemLanguageModel(useCase: .general, guardrails: .permissiveContentTransformations)
         return LanguageModelSession(model: model, instructions: correctionRationaleSystemPrompt)
     }
+    
+    // MARK: - Syntactic Check
     
     /// Runs the initial grammar correction on the text.
     func runSyntacticCheck(on text: String) async throws -> String {
@@ -75,7 +48,7 @@ class GrammarAnalyst {
             print("Re-initializing grammar check session and retrying...")
             
             // Re-initialize the session
-            (self.grammarCheckSession, self.rationaleGenerationSession) = Self.createNewSession()
+            (self.grammarCheckSession, self.rationaleGenerationSession) = Self.refreshModelSessions()
             
             // Retry the request once with the new session
             let correctedText = try await correctSyntacticErrors(text: text)
@@ -87,6 +60,47 @@ class GrammarAnalyst {
             throw error // Re-throw the error so the caller can handle it
         }
     }
+    
+    private func correctSyntacticErrors(text: String) async throws -> String {
+        while grammarCheckSession.isResponding {
+            try await Task.sleep(for: .milliseconds(100))
+        }
+        
+        // Debug: reset session every time
+        self.grammarCheckSession = Self.refreshGrammarCheckModel()
+        let prompt = checkAllCategories(forTask: text)
+        let correctedGrammarText: String
+        
+        do {
+            correctedGrammarText = try await grammarCheckSession.respond(
+                to: prompt,
+                generating: TextBlock.self,
+                options: GenerationOptions(sampling: .greedy, temperature: 0.5)
+            ).content.correctedText
+            
+        } catch LanguageModelSession.GenerationError.exceededContextWindowSize(let context) {
+            print("Warning: Exceeded context window size. Context: \(context).")
+            print("Re-initializing grammar check session and retrying...")
+            
+            self.grammarCheckSession = Self.refreshGrammarCheckModel()
+            
+            correctedGrammarText = try await grammarCheckSession.respond(
+                to: prompt,
+                generating: TextBlock.self,
+                options: GenerationOptions(sampling: .greedy, temperature: 0.5)
+            ).content.correctedText
+            
+        } catch {
+            print("An unexpected error occurred during syntactic check: \(error)")
+            throw error
+            
+        }
+        
+        print("Corrected Text: \n\(correctedGrammarText)")
+        return correctedGrammarText
+    }
+    
+    // MARK: - Rationale Generation
     
     /// Runs the initial grammar correction on the text.
     func generateEvaluation(for text: String, speechPrompt: String) async throws -> GrammarEvaluationDetail {
@@ -247,45 +261,6 @@ class GrammarAnalyst {
         }
         
         return newErrors
-    }
-    
-    private func correctSyntacticErrors(text: String) async throws -> String {
-        while grammarCheckSession.isResponding {
-            try await Task.sleep(for: .milliseconds(100))
-        }
-        
-        // Debug: reset session every time
-        self.grammarCheckSession = Self.refreshGrammarCheckModel()
-        let prompt = checkAllCategories(forTask: text)
-        let correctedGrammarText: String
-        
-        do {
-            correctedGrammarText = try await grammarCheckSession.respond(
-                to: prompt,
-                generating: TextBlock.self,
-                options: GenerationOptions(sampling: .greedy, temperature: 0.5)
-            ).content.correctedText
-            
-        } catch LanguageModelSession.GenerationError.exceededContextWindowSize(let context) {
-            print("Warning: Exceeded context window size. Context: \(context).")
-            print("Re-initializing grammar check session and retrying...")
-            
-            self.grammarCheckSession = Self.refreshGrammarCheckModel()
-            
-            correctedGrammarText = try await grammarCheckSession.respond(
-                to: prompt,
-                generating: TextBlock.self,
-                options: GenerationOptions(sampling: .greedy, temperature: 0.5)
-            ).content.correctedText
-            
-        } catch {
-            print("An unexpected error occurred during syntactic check: \(error)")
-            throw error
-            
-        }
-        
-        print("Corrected Text: \n\(correctedGrammarText)")
-        return correctedGrammarText
     }
     
 }

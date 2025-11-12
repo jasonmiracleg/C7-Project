@@ -5,6 +5,20 @@
 //  Created by Savio Enoson on 02/11/25.
 //
 
+import FoundationModels
+
+// MARK: - Generable Struct
+
+@Generable
+struct TextBlock {
+    @Guide(description: "Populate this field with the **original**, unedited input text.")
+    let originalText: String
+    
+    @Guide(description: "Populate this field with the **corrected** version of the input text.")
+    var correctedText: String = ""
+}
+
+// MARK: - Generable Struct
 
 /// System Prompt given to the flagging model at the start of each session
 let grammarCheckSystemPrompt = """
@@ -26,7 +40,6 @@ You must adhere to the following rules:
 """
 
 /// Concatenated check prompt--seems to work almost just as well? Saves a lot of time.
-/// TODO: Validate efficacy
 func checkAllCategories(forTask task: String) -> String {
     return """
     Your task is to perform a general check for all grammatical, spelling, and punctuation errors. Correct any errors you find.

@@ -25,7 +25,7 @@ struct ContextScenarioView: View {
                 }) {
                     Image(systemName: "xmark")
                         .font(.system(size: 24))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(.primary)
                         .clipShape(Circle())
                 }
                 .buttonStyle(.glass)

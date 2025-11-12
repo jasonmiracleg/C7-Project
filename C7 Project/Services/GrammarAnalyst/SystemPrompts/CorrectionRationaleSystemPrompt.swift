@@ -5,6 +5,21 @@
 //  Created by Savio Enoson on 11/11/25.
 //
 
+import FoundationModels
+
+// MARK: - Generable Struct
+
+@Generable
+struct CorrectionRationale {
+    @Guide(description: "Populate this field with the associated error's `errorID`.")
+    let errorID: Int
+    
+    @Guide(description: "Populate this field with the correction rationale. This should be **no more than three short sentences.**")
+    let rationale: String
+}
+
+// MARK: - Prompts
+
 let correctionRationaleSystemPrompt = """
 You are an expert English language tutor and pedagogical expert. Your goal is to help a user understand *why* a correction was made by appealing to their natural, human language-building logic.
 
@@ -93,6 +108,15 @@ func sequentiallyCreateRationale(error: GrammarError, jsonString: String) -> Str
 }
 
 // MARK: - Deprecated
+
+var numberOfErrors:Int = 3
+
+@Generable
+struct CorrectionResponse {
+    @Guide(description: "An array containing each correction rationale **in the same exact order.**", .count(numberOfErrors))
+    let errorRationales: [CorrectionRationale]
+}
+
 func batchCreateRationale(forTask task: GrammarEvaluationDetail) -> String {
     return """
     You must generate one (1) correction rationale for each of the \(task.totalErrorCount) errors in the `errors` list provided below.

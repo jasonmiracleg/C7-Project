@@ -129,6 +129,7 @@ class GameplayViewModel {
         print("--- MESSAGE SENT ---")
         
         chatHistory.append(ChatMessage(text: messageText, isSent: true))
+        interpretationViewModel.appendAnswer(messageText)
         cancelDraft()
         
         // Capture the prompts *before* starting async tasks
@@ -150,10 +151,6 @@ class GameplayViewModel {
             await evaluateGrammar(for: currentUserAnswer, prompt: currentAIQuestion)
         }
         
-        Task {
-            await evaluateInterpretation(for: currentUserAnswer, prompt: currentAIQuestion)
-        }
-        
         // Launch the AI follow-up question
         isWaitingForAIResponse = true
         Task {
@@ -173,37 +170,11 @@ class GameplayViewModel {
     private func addInitialPrompt() {
         if chatHistory.isEmpty {
             chatHistory.append(ChatMessage(text: story.initialPrompt, isSent: false))
+            interpretationViewModel.appendPrompt(story.initialPrompt)
         }
     }
     
-    @MainActor
-    private func evaluateInterpretation(for text: String, prompt: String) async {
-        print("--- STARTING INTERPRETATION for: \(text) ---")
-        
-        // Create the item with nil interpretation.
-        // The InterpretationItemCard will show this as a loading state.
-        let newItem = InterpretationItem(
-            promptText: prompt,
-            spokenText: text,
-            interpretedText: nil // nil indicates loading
-        )
-        
-        let itemIndex = self.interpretationViewModel.items.count
-        self.interpretationViewModel.items.append(newItem)
-        
-        do {
-            // Call the singleton Interpretor
-            let interpretationResult = try await Interpretor.shared.interpret(text)
-            
-            // Update the item in the array with the new result
-            self.interpretationViewModel.items[itemIndex].addInterpretation(interpretationResult)
-            print("--- INTERPRETATION FINISHED ---")
-            
-        } catch {
-            print("❌ ERROR during interpretation: \(error.localizedDescription)")
-            // You could add an error state to InterpretationItem if desired
-        }
-    }
+
     
     @MainActor
     private func evaluateGrammar(for text: String, prompt: String) async {

@@ -40,10 +40,18 @@ struct GrammarEvaluationView: View {
                     .presentationDetents([.medium, .large])
             }
         }
+//        .task {
+//            await viewModel.loadData()
+//        }
     }
 }
 
 #Preview {
-    // 3. MODIFY THIS: Update preview to inject a view model
-    GrammarEvaluationView(viewModel: GrammarEvaluationViewModel())
+    let vm = GrammarEvaluationViewModel()
+    
+    return GrammarEvaluationView(viewModel: vm)
+        .task {
+            // Trigger the data loading manually for the preview
+            await vm.loadData()
+        }
 }

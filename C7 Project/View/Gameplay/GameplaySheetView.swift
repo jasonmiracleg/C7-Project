@@ -28,7 +28,7 @@ struct GameplaySheetView: View {
                     HStack(alignment: VerticalAlignment.center) {
                         HStack(alignment: VerticalAlignment.center) {
                             Image(systemName: "clock.fill")
-                                .foregroundStyle(Color(.black.opacity(0.8)))
+                                .foregroundStyle(.primary.opacity(0.8))
                                 .font(Font.system(size: 18))
                             Text("02:40")
                                 .font(.subheadline)
@@ -142,7 +142,7 @@ struct GameplaySheetView: View {
                                 Image(systemName: "xmark")
                                     .resizable()
                                     .frame(width: 20, height: 20)
-                                    .foregroundStyle(Color(.black))
+                                    .foregroundStyle(.primary)
                                     .padding(12)
                                     .background(
                                         Circle()
