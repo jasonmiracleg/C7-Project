@@ -21,6 +21,10 @@ class GameplayViewModel {
     private var speechManager = SpeechManager()
     private let followUpGenerator = FollowUpQuestion()
     
+    // Evaluation view models
+    var grammarViewModel = GrammarEvaluationViewModel()
+    var interpretationViewModel = InterpretationEvaluationViewModel()
+    
     var isRecording: Bool {
         speechManager.isRecording
     }
@@ -38,7 +42,7 @@ class GameplayViewModel {
     }
     
     var lastAIQuestion: String? {
-        guard chatHistory.count >= 2 else { return nil }
+        guard chatHistory.count >= 2 else { return story.initialPrompt }
         let AImessage = chatHistory[chatHistory.count - 2]
         return !AImessage.isSent ? AImessage.text : nil
     }
@@ -127,8 +131,31 @@ class GameplayViewModel {
         chatHistory.append(ChatMessage(text: messageText, isSent: true))
         cancelDraft()
         
-        isWaitingForAIResponse = true
+        // Capture the prompts *before* starting async tasks
+        guard let currentAIQuestion = self.lastAIQuestion,
+              let currentUserAnswer = self.lastUserAnswer else {
+            print("⚠️ Could not get grammar evaluation pair. This might be the first message.")
+            
+            // Still generate the AI follow-up
+            isWaitingForAIResponse = true
+            Task {
+                print("--- AI PROCESS NEXT FOLLOW UP QUESTION (Mic Disabled) ---")
+                await generateFollowUpQuestion()
+            }
+            return
+        }
+
+        // Launch the grammar evaluation asynchronously in the background
+        Task {
+            await evaluateGrammar(for: currentUserAnswer, prompt: currentAIQuestion)
+        }
         
+        Task {
+            await evaluateInterpretation(for: currentUserAnswer, prompt: currentAIQuestion)
+        }
+        
+        // Launch the AI follow-up question
+        isWaitingForAIResponse = true
         Task {
             print("--- AI PROCESS NEXT FOLLOW UP QUESTION (Mic Disabled) ---")
             await generateFollowUpQuestion()
@@ -146,6 +173,70 @@ class GameplayViewModel {
     private func addInitialPrompt() {
         if chatHistory.isEmpty {
             chatHistory.append(ChatMessage(text: story.initialPrompt, isSent: false))
+        }
+    }
+    
+    @MainActor
+    private func evaluateInterpretation(for text: String, prompt: String) async {
+        print("--- STARTING INTERPRETATION for: \(text) ---")
+        
+        // Create the item with nil interpretation.
+        // The InterpretationItemCard will show this as a loading state.
+        let newItem = InterpretationItem(
+            promptText: prompt,
+            spokenText: text,
+            interpretedText: nil // nil indicates loading
+        )
+        
+        let itemIndex = self.interpretationViewModel.items.count
+        self.interpretationViewModel.items.append(newItem)
+        
+        do {
+            // Call the singleton Interpretor
+            let interpretationResult = try await Interpretor.shared.interpret(text)
+            
+            // Update the item in the array with the new result
+            self.interpretationViewModel.items[itemIndex].addInterpretation(interpretationResult)
+            print("--- INTERPRETATION FINISHED ---")
+            
+        } catch {
+            print("❌ ERROR during interpretation: \(error.localizedDescription)")
+            // You could add an error state to InterpretationItem if desired
+        }
+    }
+    
+    @MainActor
+    private func evaluateGrammar(for text: String, prompt: String) async {
+        print("--- STARTING GRAMMAR EVALUATION for: \(text) ---")
+        
+        // Add a placeholder card so the UI can show a loading state
+        var loadingDetail = GrammarEvaluationDetail(
+            promptText: prompt,
+            originalText: text,
+            correctedText: "",
+            errors: [:],
+            isLoading: true // Set loading flag
+        )
+        let loadingIndex = self.grammarViewModel.evaluationDetails.count
+        self.grammarViewModel.evaluationDetails.append(loadingDetail)
+        
+        do {
+            // Use the singleton GrammarAnalyst to generate the evaluation
+            let newDetail = try await GrammarAnalyst.shared.generateEvaluation(
+                for: text,
+                speechPrompt: prompt
+            )
+            
+            // Update the placeholder with the finished detail
+            self.grammarViewModel.evaluationDetails[loadingIndex] = newDetail
+            print("--- GRAMMAR EVALUATION FINISHED ---")
+            
+        } catch {
+            print("❌ ERROR during grammar evaluation: \(error.localizedDescription)")
+            // Update the placeholder to show an error
+            loadingDetail.correctedText = "Evaluation failed: \(error.localizedDescription)"
+            loadingDetail.isLoading = false
+            self.grammarViewModel.evaluationDetails[loadingIndex] = loadingDetail
         }
     }
     

@@ -14,7 +14,7 @@ struct InterpretorTestView: View {
     @State private var isLoading = false
     @State private var error: String?
     
-    let interpretor = Interpretor()
+    let interpretor = Interpretor.shared
 
     var body: some View {
         NavigationStack {

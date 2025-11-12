@@ -72,7 +72,7 @@ class InterpretationEvaluationViewModel: ObservableObject {
     //    i expect it initially has InterpretedText as nil so this generates the points from spokenText
     //  live updates
     private func generateInterpretedPoints() async {
-        let interpretor = Interpretor()
+        let interpretor = Interpretor.shared
             
         // need to use indices instead of iterating through items
         // because it needs to access array, otherwise itll only provide a copy
