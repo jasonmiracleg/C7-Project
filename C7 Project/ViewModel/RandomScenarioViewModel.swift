@@ -19,12 +19,12 @@ class RandomScenarioViewModel: ObservableObject {
         
         func loadStoryData() {
             guard let url = Bundle.main.url(forResource: "StoryData", withExtension: "json") else {
-                print("Error: File StoryData.json tidak ditemukan.")
+                print("Error: File StoryData.json not found.")
                 return
             }
 
             guard let data = try? Data(contentsOf: url) else {
-                print("Error: Gagal memuat data dari file.")
+                print("Error: Failed to load data from flie.")
                 return
             }
             
@@ -32,15 +32,15 @@ class RandomScenarioViewModel: ObservableObject {
             do {
                 let decodedData = try decoder.decode([String: [StoryDetail]].self, from: data)
                 self.storyBank = decodedData
-                print("Bank Cerita berhasil di-load.")
+                print("Bank Cerita successfully loaded.")
             } catch {
-                print("Error: Gagal men-decode StoryData.json. \(error.localizedDescription)")
+                print("Error: Failed to decode StoryData.json  \(error.localizedDescription)")
             }
         }
         
         func getRandomStory(for scenarioTitle: String) -> StoryDetail? {
             guard let storiesForScenario = storyBank[scenarioTitle] else {
-                print("Error: Tidak ada cerita ditemukan untuk key '\(scenarioTitle)'")
+                print("Error: No stories found for key'\(scenarioTitle)'")
                 return nil
             }
             
