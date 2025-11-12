@@ -16,15 +16,12 @@ enum tabSegments: String, CaseIterable{
 struct EvaluationView: View {
     @State private var selectedSegment: tabSegments = .pronunciation
     
-    @StateObject var interpretationViewModel: InterpretationEvaluationViewModel
-    
     @State private var showingPronunciationPopup = false
     @State private var pronunciationCorrection = ""
     
     // View Models
     let grammarViewModel: GrammarEvaluationViewModel
-    let interpretationViewModel: InterpretationEvaluationViewModel
-    
+    @StateObject var interpretationViewModel: InterpretationEvaluationViewModel
     
     
     var body: some View {
@@ -83,9 +80,9 @@ struct chosenTabView: View {
     }
 }
 
-#Preview {
-    EvaluationView(
-        grammarViewModel: GrammarEvaluationViewModel(),
-        interpretationViewModel: InterpretationEvaluationViewModel() // 5. UPDATE PREVIEW
-    )
-}
+//#Preview {
+//    EvaluationView(
+//        grammarViewModel: GrammarEvaluationViewModel(),
+//        interpretationViewModel: InterpretationEvaluationViewModel()
+//    )
+//}

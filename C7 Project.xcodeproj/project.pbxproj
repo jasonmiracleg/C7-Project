@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2C677B792EC2F51600E6FE42 /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2C677B782EC2F51600E6FE42 /* WhisperKit */; };
-		2C677B7B2EC2F51600E6FE42 /* whisperkit-cli in Frameworks */ = {isa = PBXBuildFile; productRef = 2C677B7A2EC2F51600E6FE42 /* whisperkit-cli */; };
+		2C9E08252EC42CB700ED412D /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2C9E08242EC42CB700ED412D /* WhisperKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,8 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2C677B792EC2F51600E6FE42 /* WhisperKit in Frameworks */,
-				2C677B7B2EC2F51600E6FE42 /* whisperkit-cli in Frameworks */,
+				2C9E08252EC42CB700ED412D /* WhisperKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,8 +94,7 @@
 			);
 			name = "C7 Project";
 			packageProductDependencies = (
-				2C677B782EC2F51600E6FE42 /* WhisperKit */,
-				2C677B7A2EC2F51600E6FE42 /* whisperkit-cli */,
+				2C9E08242EC42CB700ED412D /* WhisperKit */,
 			);
 			productName = "C7 Project";
 			productReference = 6AB0E2C22EAB1D04009489EF /* C7 Project.app */;
@@ -128,7 +125,7 @@
 			mainGroup = 6AB0E2B92EAB1D04009489EF;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				2C677B772EC2F51600E6FE42 /* XCRemoteSwiftPackageReference "WhisperKit" */,
+				2C9E08232EC42CB700ED412D /* XCRemoteSwiftPackageReference "WhisperKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6AB0E2C32EAB1D04009489EF /* Products */;
@@ -384,7 +381,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		2C677B772EC2F51600E6FE42 /* XCRemoteSwiftPackageReference "WhisperKit" */ = {
+		2C9E08232EC42CB700ED412D /* XCRemoteSwiftPackageReference "WhisperKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/argmaxinc/WhisperKit";
 			requirement = {
@@ -395,15 +392,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		2C677B782EC2F51600E6FE42 /* WhisperKit */ = {
+		2C9E08242EC42CB700ED412D /* WhisperKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2C677B772EC2F51600E6FE42 /* XCRemoteSwiftPackageReference "WhisperKit" */;
+			package = 2C9E08232EC42CB700ED412D /* XCRemoteSwiftPackageReference "WhisperKit" */;
 			productName = WhisperKit;
-		};
-		2C677B7A2EC2F51600E6FE42 /* whisperkit-cli */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2C677B772EC2F51600E6FE42 /* XCRemoteSwiftPackageReference "WhisperKit" */;
-			productName = "whisperkit-cli";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

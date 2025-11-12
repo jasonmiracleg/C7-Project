@@ -20,9 +20,6 @@ class GameplayViewModel {
     var canStopRecording: Bool = false
     var isTimeRunningOut: Bool = false
     
-//    view models for evaluation
-    var interpretationViewModel = InterpretationEvaluationViewModel()
-    
     private let story: StoryDetail
     private var speechManager = SpeechManager()
     private let followUpGenerator = FollowUpQuestion()
