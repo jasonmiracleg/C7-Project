@@ -33,6 +33,8 @@ struct GameplaySheetView: View {
                             Text("02:40")
                                 .font(.subheadline)
                         }
+                        .animation(.easeInOut, value: viewModel.isTimeRunningOut)
+                        
                         Spacer()
                         Text("Gameplay")
                             .font(.title2)
@@ -197,9 +199,10 @@ struct GameplaySheetView: View {
                                 .padding(18)
                                 .background(
                                     Circle()
-                                        .fill(Color.interactive)
+                                        .fill(viewModel.canStopRecording ? Color.interactive : Color.gray.opacity(0.5))
                                 )
                         }
+                        .disabled(!viewModel.canStopRecording)
                         
                     } else {
                         

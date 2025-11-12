@@ -5,7 +5,7 @@
 //  Created by Jason Miracle Gunawan on 24/10/25.
 //
 
-import Foundation
+import SwiftUI
 
 enum AppState {
     case onboarding
@@ -13,13 +13,12 @@ enum AppState {
     case mainApp
 }
 
-
-import SwiftUI
-
 struct ContentView: View {
+
     @State private var appState: AppState = .onboarding
-    
-    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding =
+        false
 
     var body: some View {
         if hasCompletedOnboarding {
@@ -28,10 +27,10 @@ struct ContentView: View {
             switch appState {
             case .onboarding:
                 OnboardingHalfModalView(currentAppState: $appState)
-                
+
             case .disclaimer:
                 DisclaimerView(currentAppState: $appState)
-                
+
             case .mainApp:
                 ScenarioView()
                     .onAppear {
