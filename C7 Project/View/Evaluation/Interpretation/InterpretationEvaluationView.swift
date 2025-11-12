@@ -18,29 +18,13 @@ struct InterpretationEvaluationView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             
-            
-            if let task = viewModel.currentTaskDescription, viewModel.debugging{
-                HStack {
-                    ProgressView()
-                    Text(task)
-                        .font(.subheadline)
-                }
-                .padding()
-            }
-            
             LazyVStack(spacing: 16, pinnedViews: []) {
                 ForEach(viewModel.items) { item in
                     InterpretationItemCard(
-                        promptText: item.promptText,
-                        spokenText: item.spokenText,
+                        promptText: item.getPrompt(),
+                        spokenText: item.getResponse(),
                         interpretedText: item.interpretedText
                     )
-                    
-                    if viewModel.debugging {
-                        Text(item.interpretedText == nil ? "Still interpreting" : "✅ Interpreted")
-                            .font(.caption)
-                            .foregroundColor(item.interpretedText == nil ? .orange : .green)
-                    }
                     
                 }
             }
