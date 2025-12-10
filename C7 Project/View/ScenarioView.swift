@@ -21,7 +21,7 @@ struct ScenarioView: View {
         Scenario(title: "Collaborating", description: "Work together with team members to achieve common goals.", imageName: "Collaborating", duration: 6),
         Scenario(title: "Explaining", description: "Break down complex concepts into simple, understandable terms.", imageName: "Explaining", duration: 5),
         Scenario(title: "Reporting", description: "Present data and insights clearly to stakeholders.", imageName: "Reporting", duration: 5),
-        Scenario(title: "Networking", description: "Build professional connections and expand your network effectively.", imageName: "Networking", duration: 10)
+        Scenario(title: "Networking", description: "Build professional connections and expand your network effectively.", imageName: "Networking", duration: 3)
     ]
 
     var body: some View {
