@@ -6,50 +6,36 @@
 //
 
 import SwiftUI
-import SwiftData
+
+enum AppState {
+    case onboarding
+    case disclaimer
+    case mainApp
+}
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+
+    @State private var appState: AppState = .onboarding
+
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding =
+        false
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
-        }
-    }
+        if hasCompletedOnboarding {
+            ScenarioView()
+        } else {
+            switch appState {
+            case .onboarding:
+                OnboardingHalfModalView(currentAppState: $appState)
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
+            case .disclaimer:
+                DisclaimerView(currentAppState: $appState)
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            case .mainApp:
+                ScenarioView()
+                    .onAppear {
+                        hasCompletedOnboarding = true
+                    }
             }
         }
     }
@@ -57,5 +43,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }
